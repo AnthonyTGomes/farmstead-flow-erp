@@ -1,17 +1,85 @@
 
 import React, { useState } from 'react';
-import { Bell, Users, Heart, TrendingUp, DollarSign, Calendar, Menu, X } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Bell, Menu, X } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import DashboardStats from '@/components/DashboardStats';
 import RecentActivity from '@/components/RecentActivity';
 import AlertsPanel from '@/components/AlertsPanel';
 import QuickActions from '@/components/QuickActions';
+import LivestockInventory from '@/components/LivestockInventory';
+import HealthVaccination from '@/components/HealthVaccination';
+import BreedingReproduction from '@/components/BreedingReproduction';
+import ProductionTracking from '@/components/ProductionTracking';
+import FinancialManagement from '@/components/FinancialManagement';
+import ReportsAnalytics from '@/components/ReportsAnalytics';
+import FarmSettings from '@/components/FarmSettings';
 
 const Index = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeModule, setActiveModule] = useState('dashboard');
+
+  const renderActiveModule = () => {
+    switch (activeModule) {
+      case 'dashboard':
+        return (
+          <div className="space-y-6">
+            {/* Welcome Banner */}
+            <div className="bg-gradient-to-r from-green-600 to-blue-600 rounded-lg p-6 text-white">
+              <h2 className="text-2xl font-bold mb-2">Welcome back, John!</h2>
+              <p className="text-green-100">Here's what's happening on your farm today</p>
+            </div>
+
+            {/* Dashboard Stats */}
+            <DashboardStats />
+
+            {/* Quick Actions */}
+            <QuickActions />
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Recent Activity */}
+              <div className="lg:col-span-2">
+                <RecentActivity />
+              </div>
+
+              {/* Alerts Panel */}
+              <div>
+                <AlertsPanel />
+              </div>
+            </div>
+          </div>
+        );
+      case 'livestock':
+        return <LivestockInventory />;
+      case 'health':
+        return <HealthVaccination />;
+      case 'breeding':
+        return <BreedingReproduction />;
+      case 'production':
+        return <ProductionTracking />;
+      case 'financial':
+        return <FinancialManagement />;
+      case 'reports':
+        return <ReportsAnalytics />;
+      case 'settings':
+        return <FarmSettings />;
+      default:
+        return (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4 capitalize">
+              {activeModule.replace('-', ' & ')} Module
+            </h2>
+            <p className="text-gray-600 mb-6">
+              This module is under development. Full functionality coming soon!
+            </p>
+            <div className="bg-gradient-to-r from-green-100 to-blue-100 rounded-lg p-8 text-center">
+              <div className="text-6xl mb-4">🚧</div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Module In Development</h3>
+              <p className="text-gray-600">We're working hard to bring you this feature. Stay tuned!</p>
+            </div>
+          </div>
+        );
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
@@ -58,49 +126,7 @@ const Index = () => {
 
           {/* Main Content */}
           <div className="flex-1">
-            {activeModule === 'dashboard' && (
-              <div className="space-y-6">
-                {/* Welcome Banner */}
-                <div className="bg-gradient-to-r from-green-600 to-blue-600 rounded-lg p-6 text-white">
-                  <h2 className="text-2xl font-bold mb-2">Welcome back, John!</h2>
-                  <p className="text-green-100">Here's what's happening on your farm today</p>
-                </div>
-
-                {/* Dashboard Stats */}
-                <DashboardStats />
-
-                {/* Quick Actions */}
-                <QuickActions />
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Recent Activity */}
-                  <div className="lg:col-span-2">
-                    <RecentActivity />
-                  </div>
-
-                  {/* Alerts Panel */}
-                  <div>
-                    <AlertsPanel />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeModule !== 'dashboard' && (
-              <div className="bg-white rounded-lg shadow-lg p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 capitalize">
-                  {activeModule.replace('-', ' & ')} Module
-                </h2>
-                <p className="text-gray-600 mb-6">
-                  This module is under development. Full functionality coming soon!
-                </p>
-                <div className="bg-gradient-to-r from-green-100 to-blue-100 rounded-lg p-8 text-center">
-                  <div className="text-6xl mb-4">🚧</div>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">Module In Development</h3>
-                  <p className="text-gray-600">We're working hard to bring you this feature. Stay tuned!</p>
-                </div>
-              </div>
-            )}
+            {renderActiveModule()}
           </div>
         </div>
       </div>
