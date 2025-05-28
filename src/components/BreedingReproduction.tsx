@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Baby, Calendar, Plus } from 'lucide-react';
+import { Heart, Baby, Calendar } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import BreedingModal from '@/components/modals/BreedingModal';
 
 const BreedingReproduction = () => {
   const [breedingRecords] = useState([
@@ -68,14 +67,8 @@ const BreedingReproduction = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold text-gray-900">Breeding & Reproduction</h2>
         <div className="flex space-x-2">
-          <Button className="bg-purple-600 hover:bg-purple-700">
-            <Heart className="w-4 h-4 mr-2" />
-            Record Breeding
-          </Button>
-          <Button className="bg-pink-600 hover:bg-pink-700">
-            <Baby className="w-4 h-4 mr-2" />
-            Record Birth
-          </Button>
+          <BreedingModal type="breeding" />
+          <BreedingModal type="birth" />
         </div>
       </div>
 

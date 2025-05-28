@@ -1,13 +1,15 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Search, Filter, Eye, Edit, Trash2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Search, Filter, Eye, Edit, Trash2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useToast } from '@/hooks/use-toast';
+import AddAnimalModal from '@/components/modals/AddAnimalModal';
 
 const LivestockInventory = () => {
-  const [animals] = useState([
+  const [animals, setAnimals] = useState([
     {
       id: 'COW001',
       name: 'Bella',
@@ -40,6 +42,46 @@ const LivestockInventory = () => {
     }
   ]);
 
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
+  const { toast } = useToast();
+
+  const filteredAnimals = animals.filter(animal => {
+    const matchesSearch = animal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         animal.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         animal.breed.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterStatus === '' || animal.status === filterStatus;
+    return matchesSearch && matchesFilter;
+  });
+
+  const handleAddAnimal = (newAnimal: any) => {
+    setAnimals([...animals, newAnimal]);
+  };
+
+  const handleViewAnimal = (animal: any) => {
+    console.log('Viewing animal:', animal);
+    toast({
+      title: "Animal Details",
+      description: `Viewing details for ${animal.name} (${animal.id})`,
+    });
+  };
+
+  const handleEditAnimal = (animal: any) => {
+    console.log('Editing animal:', animal);
+    toast({
+      title: "Edit Animal",
+      description: `Opening edit form for ${animal.name}`,
+    });
+  };
+
+  const handleDeleteAnimal = (animalId: string) => {
+    setAnimals(animals.filter(animal => animal.id !== animalId));
+    toast({
+      title: "Animal Removed",
+      description: "Animal has been removed from inventory",
+    });
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Active': return 'bg-green-100 text-green-800';
@@ -53,10 +95,7 @@ const LivestockInventory = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold text-gray-900">Livestock Inventory</h2>
-        <Button className="bg-green-600 hover:bg-green-700">
-          <Plus className="w-4 h-4 mr-2" />
-          Add Animal
-        </Button>
+        <AddAnimalModal onAnimalAdded={handleAddAnimal} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -91,13 +130,22 @@ const LivestockInventory = () => {
           <div className="flex justify-between items-center">
             <CardTitle>Animal Registry</CardTitle>
             <div className="flex space-x-2">
-              <Button variant="outline" size="sm">
-                <Search className="w-4 h-4 mr-2" />
-                Search
-              </Button>
-              <Button variant="outline" size="sm">
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Input
+                  placeholder="Search animals..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 w-64"
+                />
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setFilterStatus(filterStatus === 'Active' ? '' : 'Active')}
+              >
                 <Filter className="w-4 h-4 mr-2" />
-                Filter
+                {filterStatus === 'Active' ? 'Show All' : 'Active Only'}
               </Button>
             </div>
           </div>
@@ -117,7 +165,7 @@ const LivestockInventory = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {animals.map((animal) => (
+              {filteredAnimals.map((animal) => (
                 <TableRow key={animal.id}>
                   <TableCell className="font-medium">{animal.id}</TableCell>
                   <TableCell>{animal.name}</TableCell>
@@ -132,13 +180,13 @@ const LivestockInventory = () => {
                   <TableCell>{animal.location}</TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" onClick={() => handleViewAnimal(animal)}>
                         <Eye className="w-4 h-4" />
                       </Button>
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" onClick={() => handleEditAnimal(animal)}>
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" onClick={() => handleDeleteAnimal(animal.id)}>
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>

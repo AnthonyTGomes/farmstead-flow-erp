@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign, TrendingUp, TrendingDown, Plus, Receipt } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import FinancialModal from '@/components/modals/FinancialModal';
 
 const FinancialManagement = () => {
   const [transactions] = useState([
@@ -60,14 +59,8 @@ const FinancialManagement = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold text-gray-900">Financial Management</h2>
         <div className="flex space-x-2">
-          <Button className="bg-green-600 hover:bg-green-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Income
-          </Button>
-          <Button className="bg-red-600 hover:bg-red-700">
-            <Receipt className="w-4 h-4 mr-2" />
-            Add Expense
-          </Button>
+          <FinancialModal type="income" />
+          <FinancialModal type="expense" />
         </div>
       </div>
 
@@ -124,7 +117,7 @@ const FinancialManagement = () => {
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Receipt className="w-5 h-5 mr-2 text-blue-600" />
+              <TrendingUp className="w-5 h-5 mr-2 text-blue-600" />
               Recent Transactions
             </CardTitle>
           </CardHeader>
