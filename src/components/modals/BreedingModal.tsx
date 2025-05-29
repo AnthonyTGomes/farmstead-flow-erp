@@ -12,31 +12,46 @@ interface BreedingModalProps {
   type: 'breeding' | 'birth';
 }
 
+interface BreedingFormData {
+  femaleId: string;
+  maleId: string;
+  breedingDate: string;
+  method: string;
+  notes: string;
+}
+
+interface BirthFormData {
+  motherId: string;
+  calfName: string;
+  birthDate: string;
+  gender: string;
+  weight: string;
+  status: string;
+}
+
 const BreedingModal = ({ type }: BreedingModalProps) => {
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState(
-    type === 'breeding' 
-      ? {
-          femaleId: '',
-          maleId: '',
-          breedingDate: '',
-          method: '',
-          notes: ''
-        }
-      : {
-          motherId: '',
-          calfName: '',
-          birthDate: '',
-          gender: '',
-          weight: '',
-          status: 'Healthy'
-        }
-  );
+  const [breedingData, setBreedingData] = useState<BreedingFormData>({
+    femaleId: '',
+    maleId: '',
+    breedingDate: '',
+    method: '',
+    notes: ''
+  });
+  const [birthData, setBirthData] = useState<BirthFormData>({
+    motherId: '',
+    calfName: '',
+    birthDate: '',
+    gender: '',
+    weight: '',
+    status: 'Healthy'
+  });
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    const formData = type === 'breeding' ? breedingData : birthData;
     console.log(`Recording ${type}:`, formData);
     
     toast({
@@ -44,12 +59,33 @@ const BreedingModal = ({ type }: BreedingModalProps) => {
       description: `${type === 'breeding' ? 'Breeding record' : 'Birth record'} has been successfully saved.`,
     });
 
-    setFormData(
-      type === 'breeding' 
-        ? { femaleId: '', maleId: '', breedingDate: '', method: '', notes: '' }
-        : { motherId: '', calfName: '', birthDate: '', gender: '', weight: '', status: 'Healthy' }
-    );
+    if (type === 'breeding') {
+      setBreedingData({
+        femaleId: '',
+        maleId: '',
+        breedingDate: '',
+        method: '',
+        notes: ''
+      });
+    } else {
+      setBirthData({
+        motherId: '',
+        calfName: '',
+        birthDate: '',
+        gender: '',
+        weight: '',
+        status: 'Healthy'
+      });
+    }
     setOpen(false);
+  };
+
+  const updateBreedingData = (field: keyof BreedingFormData, value: string) => {
+    setBreedingData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const updateBirthData = (field: keyof BirthFormData, value: string) => {
+    setBirthData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -72,8 +108,8 @@ const BreedingModal = ({ type }: BreedingModalProps) => {
                   <Label htmlFor="femaleId">Female ID</Label>
                   <Input
                     id="femaleId"
-                    value={formData.femaleId}
-                    onChange={(e) => setFormData({ ...formData, femaleId: e.target.value })}
+                    value={breedingData.femaleId}
+                    onChange={(e) => updateBreedingData('femaleId', e.target.value)}
                     placeholder="e.g., COW001"
                     required
                   />
@@ -82,8 +118,8 @@ const BreedingModal = ({ type }: BreedingModalProps) => {
                   <Label htmlFor="maleId">Male/AI ID</Label>
                   <Input
                     id="maleId"
-                    value={formData.maleId}
-                    onChange={(e) => setFormData({ ...formData, maleId: e.target.value })}
+                    value={breedingData.maleId}
+                    onChange={(e) => updateBreedingData('maleId', e.target.value)}
                     placeholder="e.g., BULL001"
                     required
                   />
@@ -96,14 +132,14 @@ const BreedingModal = ({ type }: BreedingModalProps) => {
                   <Input
                     id="breedingDate"
                     type="date"
-                    value={formData.breedingDate}
-                    onChange={(e) => setFormData({ ...formData, breedingDate: e.target.value })}
+                    value={breedingData.breedingDate}
+                    onChange={(e) => updateBreedingData('breedingDate', e.target.value)}
                     required
                   />
                 </div>
                 <div>
                   <Label htmlFor="method">Method</Label>
-                  <Select value={formData.method} onValueChange={(value) => setFormData({ ...formData, method: value })}>
+                  <Select value={breedingData.method} onValueChange={(value) => updateBreedingData('method', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select method" />
                     </SelectTrigger>
@@ -114,6 +150,16 @@ const BreedingModal = ({ type }: BreedingModalProps) => {
                   </Select>
                 </div>
               </div>
+
+              <div>
+                <Label htmlFor="notes">Notes</Label>
+                <Input
+                  id="notes"
+                  value={breedingData.notes}
+                  onChange={(e) => updateBreedingData('notes', e.target.value)}
+                  placeholder="Additional notes..."
+                />
+              </div>
             </>
           ) : (
             <>
@@ -122,8 +168,8 @@ const BreedingModal = ({ type }: BreedingModalProps) => {
                   <Label htmlFor="motherId">Mother ID</Label>
                   <Input
                     id="motherId"
-                    value={formData.motherId}
-                    onChange={(e) => setFormData({ ...formData, motherId: e.target.value })}
+                    value={birthData.motherId}
+                    onChange={(e) => updateBirthData('motherId', e.target.value)}
                     placeholder="e.g., COW001"
                     required
                   />
@@ -132,8 +178,8 @@ const BreedingModal = ({ type }: BreedingModalProps) => {
                   <Label htmlFor="calfName">Calf Name</Label>
                   <Input
                     id="calfName"
-                    value={formData.calfName}
-                    onChange={(e) => setFormData({ ...formData, calfName: e.target.value })}
+                    value={birthData.calfName}
+                    onChange={(e) => updateBirthData('calfName', e.target.value)}
                     placeholder="e.g., Little Belle"
                     required
                   />
@@ -146,14 +192,14 @@ const BreedingModal = ({ type }: BreedingModalProps) => {
                   <Input
                     id="birthDate"
                     type="date"
-                    value={formData.birthDate}
-                    onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+                    value={birthData.birthDate}
+                    onChange={(e) => updateBirthData('birthDate', e.target.value)}
                     required
                   />
                 </div>
                 <div>
                   <Label htmlFor="gender">Gender</Label>
-                  <Select value={formData.gender} onValueChange={(value) => setFormData({ ...formData, gender: value })}>
+                  <Select value={birthData.gender} onValueChange={(value) => updateBirthData('gender', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select gender" />
                     </SelectTrigger>
@@ -169,8 +215,8 @@ const BreedingModal = ({ type }: BreedingModalProps) => {
                 <Label htmlFor="weight">Birth Weight</Label>
                 <Input
                   id="weight"
-                  value={formData.weight}
-                  onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                  value={birthData.weight}
+                  onChange={(e) => updateBirthData('weight', e.target.value)}
                   placeholder="e.g., 35 kg"
                   required
                 />
