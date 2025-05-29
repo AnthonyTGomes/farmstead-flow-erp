@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Milk, Beef, TrendingUp, Plus, Calendar } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import ProductionModal from '@/components/modals/ProductionModal';
+import FeedModal from '@/components/modals/FeedModal';
 
 const ProductionTracking = () => {
   const [milkRecords] = useState([
@@ -76,14 +76,8 @@ const ProductionTracking = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold text-gray-900">Production Tracking</h2>
         <div className="flex space-x-2">
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            <Milk className="w-4 h-4 mr-2" />
-            Record Milk
-          </Button>
-          <Button className="bg-green-600 hover:bg-green-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Feed Log
-          </Button>
+          <ProductionModal />
+          <FeedModal />
         </div>
       </div>
 
