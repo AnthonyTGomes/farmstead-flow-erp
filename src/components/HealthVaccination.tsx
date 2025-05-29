@@ -1,10 +1,10 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, AlertTriangle, Plus, Syringe, Heart } from 'lucide-react';
+import { Calendar, AlertTriangle, Syringe, Heart } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import VaccinationModal from '@/components/modals/VaccinationModal';
+import HealthModal from '@/components/modals/HealthModal';
 
 const HealthVaccination = () => {
   const [vaccinations] = useState([
@@ -71,14 +71,8 @@ const HealthVaccination = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-3xl font-bold text-gray-900">Health & Vaccination</h2>
         <div className="flex space-x-2">
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            <Calendar className="w-4 h-4 mr-2" />
-            Schedule Vaccination
-          </Button>
-          <Button className="bg-red-600 hover:bg-red-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Record Health Issue
-          </Button>
+          <VaccinationModal />
+          <HealthModal />
         </div>
       </div>
 

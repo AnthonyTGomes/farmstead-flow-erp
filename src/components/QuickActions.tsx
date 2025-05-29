@@ -5,6 +5,7 @@ import { Plus, Calendar, FileText, Heart } from 'lucide-react';
 import AddAnimalModal from '@/components/modals/AddAnimalModal';
 import VaccinationModal from '@/components/modals/VaccinationModal';
 import ProductionModal from '@/components/modals/ProductionModal';
+import HealthModal from '@/components/modals/HealthModal';
 
 const QuickActions = () => {
   return (
@@ -27,13 +28,7 @@ const QuickActions = () => {
           </div>
           
           <div className="flex flex-col items-center space-y-2 p-4 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
-            <div className="flex items-center space-x-2">
-              <Heart className="w-8 h-8" />
-              <div className="text-center">
-                <div className="font-semibold text-sm">Health Check</div>
-                <div className="text-xs opacity-90">Record animal health observations</div>
-              </div>
-            </div>
+            <HealthModal />
           </div>
         </div>
       </CardContent>
