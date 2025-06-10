@@ -7,10 +7,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast';
 import BreedingModal from '@/components/modals/BreedingModal';
 import ViewBreedingModal from '@/components/modals/ViewBreedingModal';
+import StatusSelector from '@/components/ui/status-selector';
 
 const BreedingReproduction = () => {
-  const [breedingRecords] = useState([
+  const [breedingRecords, setBreedingRecords] = useState([
     {
+      id: 'BREED001',
       femaleId: 'COW001',
       femaleName: 'Bella',
       maleId: 'BULL001',
@@ -21,6 +23,7 @@ const BreedingReproduction = () => {
       stage: '2 months'
     },
     {
+      id: 'BREED002',
       femaleId: 'COW005',
       femaleName: 'Luna',
       maleId: 'AI-001',
@@ -32,8 +35,9 @@ const BreedingReproduction = () => {
     }
   ]);
 
-  const [birthRecords] = useState([
+  const [birthRecords, setBirthRecords] = useState([
     {
+      id: 'BIRTH001',
       motherId: 'COW002',
       motherName: 'Daisy',
       calfId: 'CALF001',
@@ -44,6 +48,7 @@ const BreedingReproduction = () => {
       status: 'Healthy'
     },
     {
+      id: 'BIRTH002',
       motherId: 'COW003',
       motherName: 'Rosie',
       calfId: 'CALF002',
@@ -59,14 +64,49 @@ const BreedingReproduction = () => {
   const [selectedBreedingRecord, setSelectedBreedingRecord] = useState(null);
   const { toast } = useToast();
 
+  const breedingStatusOptions = [
+    { value: 'Breeding', label: 'Breeding', color: 'bg-blue-100 text-blue-800' },
+    { value: 'Confirmed', label: 'Confirmed', color: 'bg-green-100 text-green-800' },
+    { value: 'Pregnant', label: 'Pregnant', color: 'bg-purple-100 text-purple-800' },
+    { value: 'Failed', label: 'Failed', color: 'bg-red-100 text-red-800' },
+    { value: 'Completed', label: 'Completed', color: 'bg-gray-100 text-gray-800' }
+  ];
+
+  const birthStatusOptions = [
+    { value: 'Healthy', label: 'Healthy', color: 'bg-green-100 text-green-800' },
+    { value: 'Monitoring', label: 'Monitoring', color: 'bg-yellow-100 text-yellow-800' },
+    { value: 'Sick', label: 'Sick', color: 'bg-red-100 text-red-800' },
+    { value: 'Deceased', label: 'Deceased', color: 'bg-gray-100 text-gray-800' }
+  ];
+
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Pregnant': return 'bg-purple-100 text-purple-800';
-      case 'Confirmed': return 'bg-green-100 text-green-800';
-      case 'Breeding': return 'bg-blue-100 text-blue-800';
-      case 'Healthy': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+    const allOptions = [...breedingStatusOptions, ...birthStatusOptions];
+    const option = allOptions.find(opt => opt.value === status);
+    return option?.color || 'bg-gray-100 text-gray-800';
+  };
+
+  const handleBreedingStatusChange = (recordId: string, newStatus: string) => {
+    setBreedingRecords(prev => prev.map(record => 
+      record.id === recordId ? { ...record, status: newStatus } : record
+    ));
+    
+    const record = breedingRecords.find(r => r.id === recordId);
+    toast({
+      title: "Breeding Status Updated",
+      description: `${record?.femaleName}'s breeding status changed to ${newStatus}`,
+    });
+  };
+
+  const handleBirthStatusChange = (recordId: string, newStatus: string) => {
+    setBirthRecords(prev => prev.map(record => 
+      record.id === recordId ? { ...record, status: newStatus } : record
+    ));
+    
+    const record = birthRecords.find(r => r.id === recordId);
+    toast({
+      title: "Birth Record Updated",
+      description: `${record?.calfName}'s status changed to ${newStatus}`,
+    });
   };
 
   const handleViewBreeding = (record: any) => {
@@ -83,7 +123,7 @@ const BreedingReproduction = () => {
   };
 
   const handleDeleteBreeding = (recordId: string) => {
-    console.log('Deleting breeding record:', recordId);
+    setBreedingRecords(prev => prev.filter(record => record.id !== recordId));
     toast({
       title: "Breeding Record Deleted",
       description: "Breeding record has been removed",
@@ -107,7 +147,7 @@ const BreedingReproduction = () => {
   };
 
   const handleDeleteBirth = (recordId: string) => {
-    console.log('Deleting birth record:', recordId);
+    setBirthRecords(prev => prev.filter(record => record.id !== recordId));
     toast({
       title: "Birth Record Deleted",
       description: "Birth record has been removed",
@@ -124,6 +164,7 @@ const BreedingReproduction = () => {
         </div>
       </div>
 
+      
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
@@ -193,8 +234,8 @@ const BreedingReproduction = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {breedingRecords.map((record, index) => (
-                  <TableRow key={index}>
+                {breedingRecords.map((record) => (
+                  <TableRow key={record.id}>
                     <TableCell>
                       <div>
                         <div className="font-medium">{record.femaleName}</div>
@@ -209,9 +250,12 @@ const BreedingReproduction = () => {
                     </TableCell>
                     <TableCell>{record.expectedCalving}</TableCell>
                     <TableCell>
-                      <Badge className={getStatusColor(record.status)}>
-                        {record.status}
-                      </Badge>
+                      <StatusSelector
+                        currentStatus={record.status}
+                        options={breedingStatusOptions}
+                        onStatusChange={(newStatus) => handleBreedingStatusChange(record.id, newStatus)}
+                        size="sm"
+                      />
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-1">
@@ -221,7 +265,7 @@ const BreedingReproduction = () => {
                         <Button variant="ghost" size="sm" onClick={() => handleEditBreeding(record)}>
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDeleteBreeding(record.femaleId)}>
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteBreeding(record.id)}>
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
@@ -252,8 +296,8 @@ const BreedingReproduction = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {birthRecords.map((record, index) => (
-                  <TableRow key={index}>
+                {birthRecords.map((record) => (
+                  <TableRow key={record.id}>
                     <TableCell>
                       <div>
                         <div className="font-medium">{record.calfName}</div>
@@ -268,9 +312,12 @@ const BreedingReproduction = () => {
                     </TableCell>
                     <TableCell>{record.birthDate}</TableCell>
                     <TableCell>
-                      <Badge className={getStatusColor(record.status)}>
-                        {record.status}
-                      </Badge>
+                      <StatusSelector
+                        currentStatus={record.status}
+                        options={birthStatusOptions}
+                        onStatusChange={(newStatus) => handleBirthStatusChange(record.id, newStatus)}
+                        size="sm"
+                      />
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-1">
@@ -280,7 +327,7 @@ const BreedingReproduction = () => {
                         <Button variant="ghost" size="sm" onClick={() => handleEditBirth(record)}>
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDeleteBirth(record.calfId)}>
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteBirth(record.id)}>
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>

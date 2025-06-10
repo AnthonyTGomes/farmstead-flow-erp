@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, AlertTriangle, Syringe, Heart } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Calendar, AlertTriangle, Syringe, Heart, Eye, Edit, Trash2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useToast } from '@/hooks/use-toast';
 import VaccinationModal from '@/components/modals/VaccinationModal';
 import HealthModal from '@/components/modals/HealthModal';
+import StatusSelector from '@/components/ui/status-selector';
 
 const HealthVaccination = () => {
-  const [vaccinations] = useState([
+  const [vaccinations, setVaccinations] = useState([
     {
+      id: 'VAC001',
       animalId: 'COW001',
       animalName: 'Bella',
       vaccine: 'FMD Vaccine',
@@ -17,6 +21,7 @@ const HealthVaccination = () => {
       lastVaccinated: '2024-03-15'
     },
     {
+      id: 'VAC002',
       animalId: 'COW002',
       animalName: 'Thunder',
       vaccine: 'Brucellosis',
@@ -25,6 +30,7 @@ const HealthVaccination = () => {
       lastVaccinated: '2023-12-20'
     },
     {
+      id: 'VAC003',
       animalId: 'COW003',
       animalName: 'Daisy',
       vaccine: 'Anthrax',
@@ -34,8 +40,9 @@ const HealthVaccination = () => {
     }
   ]);
 
-  const [healthRecords] = useState([
+  const [healthRecords, setHealthRecords] = useState([
     {
+      id: 'HEALTH001',
       animalId: 'COW003',
       animalName: 'Daisy',
       condition: 'Mastitis',
@@ -45,6 +52,7 @@ const HealthVaccination = () => {
       status: 'Under Treatment'
     },
     {
+      id: 'HEALTH002',
       animalId: 'COW004',
       animalName: 'Moo',
       condition: 'Hoof Rot',
@@ -55,15 +63,95 @@ const HealthVaccination = () => {
     }
   ]);
 
+  const { toast } = useToast();
+
+  const vaccinationStatusOptions = [
+    { value: 'Scheduled', label: 'Scheduled', color: 'bg-blue-100 text-blue-800' },
+    { value: 'Due', label: 'Due', color: 'bg-yellow-100 text-yellow-800' },
+    { value: 'Overdue', label: 'Overdue', color: 'bg-red-100 text-red-800' },
+    { value: 'Completed', label: 'Completed', color: 'bg-green-100 text-green-800' },
+    { value: 'Cancelled', label: 'Cancelled', color: 'bg-gray-100 text-gray-800' }
+  ];
+
+  const healthStatusOptions = [
+    { value: 'Under Treatment', label: 'Under Treatment', color: 'bg-orange-100 text-orange-800' },
+    { value: 'Recovered', label: 'Recovered', color: 'bg-green-100 text-green-800' },
+    { value: 'Chronic', label: 'Chronic', color: 'bg-purple-100 text-purple-800' },
+    { value: 'Monitoring', label: 'Monitoring', color: 'bg-blue-100 text-blue-800' }
+  ];
+
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Due': return 'bg-yellow-100 text-yellow-800';
-      case 'Overdue': return 'bg-red-100 text-red-800';
-      case 'Scheduled': return 'bg-blue-100 text-blue-800';
-      case 'Under Treatment': return 'bg-orange-100 text-orange-800';
-      case 'Recovered': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+    const allOptions = [...vaccinationStatusOptions, ...healthStatusOptions];
+    const option = allOptions.find(opt => opt.value === status);
+    return option?.color || 'bg-gray-100 text-gray-800';
+  };
+
+  const handleVaccinationStatusChange = (vaccinationId: string, newStatus: string) => {
+    setVaccinations(prev => prev.map(vac => 
+      vac.id === vaccinationId ? { ...vac, status: newStatus } : vac
+    ));
+    
+    const vaccination = vaccinations.find(v => v.id === vaccinationId);
+    toast({
+      title: "Vaccination Status Updated",
+      description: `${vaccination?.animalName}'s ${vaccination?.vaccine} status changed to ${newStatus}`,
+    });
+  };
+
+  const handleHealthStatusChange = (recordId: string, newStatus: string) => {
+    setHealthRecords(prev => prev.map(record => 
+      record.id === recordId ? { ...record, status: newStatus } : record
+    ));
+    
+    const record = healthRecords.find(r => r.id === recordId);
+    toast({
+      title: "Health Record Updated",
+      description: `${record?.animalName}'s ${record?.condition} status changed to ${newStatus}`,
+    });
+  };
+
+  const handleViewVaccination = (vaccination: any) => {
+    toast({
+      title: "Vaccination Details",
+      description: `Viewing details for ${vaccination.animalName} - ${vaccination.vaccine}`,
+    });
+  };
+
+  const handleEditVaccination = (vaccination: any) => {
+    toast({
+      title: "Edit Vaccination",
+      description: `Opening edit form for ${vaccination.animalName} - ${vaccination.vaccine}`,
+    });
+  };
+
+  const handleDeleteVaccination = (vaccinationId: string) => {
+    setVaccinations(prev => prev.filter(vac => vac.id !== vaccinationId));
+    toast({
+      title: "Vaccination Record Deleted",
+      description: "Vaccination record has been removed",
+    });
+  };
+
+  const handleViewHealth = (record: any) => {
+    toast({
+      title: "Health Record Details",
+      description: `Viewing details for ${record.animalName} - ${record.condition}`,
+    });
+  };
+
+  const handleEditHealth = (record: any) => {
+    toast({
+      title: "Edit Health Record",
+      description: `Opening edit form for ${record.animalName} - ${record.condition}`,
+    });
+  };
+
+  const handleDeleteHealth = (recordId: string) => {
+    setHealthRecords(prev => prev.filter(record => record.id !== recordId));
+    toast({
+      title: "Health Record Deleted",
+      description: "Health record has been removed",
+    });
   };
 
   return (
@@ -76,6 +164,7 @@ const HealthVaccination = () => {
         </div>
       </div>
 
+      
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
@@ -139,11 +228,12 @@ const HealthVaccination = () => {
                   <TableHead>Vaccine</TableHead>
                   <TableHead>Due Date</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {vaccinations.map((vac, index) => (
-                  <TableRow key={index}>
+                {vaccinations.map((vac) => (
+                  <TableRow key={vac.id}>
                     <TableCell>
                       <div>
                         <div className="font-medium">{vac.animalName}</div>
@@ -153,9 +243,25 @@ const HealthVaccination = () => {
                     <TableCell>{vac.vaccine}</TableCell>
                     <TableCell>{vac.dueDate}</TableCell>
                     <TableCell>
-                      <Badge className={getStatusColor(vac.status)}>
-                        {vac.status}
-                      </Badge>
+                      <StatusSelector
+                        currentStatus={vac.status}
+                        options={vaccinationStatusOptions}
+                        onStatusChange={(newStatus) => handleVaccinationStatusChange(vac.id, newStatus)}
+                        size="sm"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-1">
+                        <Button variant="ghost" size="sm" onClick={() => handleViewVaccination(vac)}>
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleEditVaccination(vac)}>
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteVaccination(vac.id)}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -179,11 +285,12 @@ const HealthVaccination = () => {
                   <TableHead>Condition</TableHead>
                   <TableHead>Treatment</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {healthRecords.map((record, index) => (
-                  <TableRow key={index}>
+                {healthRecords.map((record) => (
+                  <TableRow key={record.id}>
                     <TableCell>
                       <div>
                         <div className="font-medium">{record.animalName}</div>
@@ -193,9 +300,25 @@ const HealthVaccination = () => {
                     <TableCell>{record.condition}</TableCell>
                     <TableCell>{record.treatment}</TableCell>
                     <TableCell>
-                      <Badge className={getStatusColor(record.status)}>
-                        {record.status}
-                      </Badge>
+                      <StatusSelector
+                        currentStatus={record.status}
+                        options={healthStatusOptions}
+                        onStatusChange={(newStatus) => handleHealthStatusChange(record.id, newStatus)}
+                        size="sm"
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-1">
+                        <Button variant="ghost" size="sm" onClick={() => handleViewHealth(record)}>
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleEditHealth(record)}>
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteHealth(record.id)}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
