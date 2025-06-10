@@ -7,6 +7,7 @@ import { Search, Filter, Eye, Edit, Trash2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import AddAnimalModal from '@/components/modals/AddAnimalModal';
+import ViewAnimalModal from '@/components/modals/ViewAnimalModal';
 
 const LivestockInventory = () => {
   const [animals, setAnimals] = useState([
@@ -44,26 +45,13 @@ const LivestockInventory = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedAnimal, setSelectedAnimal] = useState(null);
   const { toast } = useToast();
 
-  const filteredAnimals = animals.filter(animal => {
-    const matchesSearch = animal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         animal.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         animal.breed.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === '' || animal.status === filterStatus;
-    return matchesSearch && matchesFilter;
-  });
-
-  const handleAddAnimal = (newAnimal: any) => {
-    setAnimals([...animals, newAnimal]);
-  };
-
   const handleViewAnimal = (animal: any) => {
-    console.log('Viewing animal:', animal);
-    toast({
-      title: "Animal Details",
-      description: `Viewing details for ${animal.name} (${animal.id})`,
-    });
+    setSelectedAnimal(animal);
+    setViewModalOpen(true);
   };
 
   const handleEditAnimal = (animal: any) => {
@@ -89,6 +77,18 @@ const LivestockInventory = () => {
       case 'Sold': return 'bg-blue-100 text-blue-800';
       default: return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const filteredAnimals = animals.filter(animal => {
+    const matchesSearch = animal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         animal.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         animal.breed.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterStatus === '' || animal.status === filterStatus;
+    return matchesSearch && matchesFilter;
+  });
+
+  const handleAddAnimal = (newAnimal: any) => {
+    setAnimals([...animals, newAnimal]);
   };
 
   return (
@@ -197,6 +197,12 @@ const LivestockInventory = () => {
           </Table>
         </CardContent>
       </Card>
+
+      <ViewAnimalModal 
+        open={viewModalOpen}
+        onOpenChange={setViewModalOpen}
+        animal={selectedAnimal}
+      />
     </div>
   );
 };

@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { DollarSign, TrendingUp, TrendingDown, Eye, Edit, Trash2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useToast } from '@/hooks/use-toast';
 import FinancialModal from '@/components/modals/FinancialModal';
+import ViewTransactionModal from '@/components/modals/ViewTransactionModal';
 
 const FinancialManagement = () => {
   const [transactions] = useState([
@@ -50,8 +53,33 @@ const FinancialManagement = () => {
     { category: 'Other', amount: 1300, percentage: 7 }
   ]);
 
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const { toast } = useToast();
+
   const getTransactionColor = (type: string) => {
     return type === 'Income' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+  };
+
+  const handleViewTransaction = (transaction: any) => {
+    setSelectedTransaction(transaction);
+    setViewModalOpen(true);
+  };
+
+  const handleEditTransaction = (transaction: any) => {
+    console.log('Editing transaction:', transaction);
+    toast({
+      title: "Edit Transaction",
+      description: `Opening edit form for ${transaction.id}`,
+    });
+  };
+
+  const handleDeleteTransaction = (transactionId: string) => {
+    console.log('Deleting transaction:', transactionId);
+    toast({
+      title: "Transaction Deleted",
+      description: "Transaction has been removed",
+    });
   };
 
   return (
@@ -130,6 +158,7 @@ const FinancialManagement = () => {
                   <TableHead>Category</TableHead>
                   <TableHead>Amount</TableHead>
                   <TableHead>Description</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -146,6 +175,19 @@ const FinancialManagement = () => {
                       {txn.type === 'Income' ? '+' : '-'}${txn.amount}
                     </TableCell>
                     <TableCell className="text-sm">{txn.description}</TableCell>
+                    <TableCell>
+                      <div className="flex space-x-1">
+                        <Button variant="ghost" size="sm" onClick={() => handleViewTransaction(txn)}>
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleEditTransaction(txn)}>
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteTransaction(txn.id)}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -187,6 +229,12 @@ const FinancialManagement = () => {
           </CardContent>
         </Card>
       </div>
+
+      <ViewTransactionModal 
+        open={viewModalOpen}
+        onOpenChange={setViewModalOpen}
+        transaction={selectedTransaction}
+      />
     </div>
   );
 };

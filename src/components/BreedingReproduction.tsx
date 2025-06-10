@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Baby, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Heart, Baby, Calendar, Eye, Edit, Trash2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useToast } from '@/hooks/use-toast';
 import BreedingModal from '@/components/modals/BreedingModal';
+import ViewBreedingModal from '@/components/modals/ViewBreedingModal';
 
 const BreedingReproduction = () => {
   const [breedingRecords] = useState([
@@ -52,6 +55,10 @@ const BreedingReproduction = () => {
     }
   ]);
 
+  const [viewBreedingModalOpen, setViewBreedingModalOpen] = useState(false);
+  const [selectedBreedingRecord, setSelectedBreedingRecord] = useState(null);
+  const { toast } = useToast();
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Pregnant': return 'bg-purple-100 text-purple-800';
@@ -60,6 +67,51 @@ const BreedingReproduction = () => {
       case 'Healthy': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
     }
+  };
+
+  const handleViewBreeding = (record: any) => {
+    setSelectedBreedingRecord(record);
+    setViewBreedingModalOpen(true);
+  };
+
+  const handleEditBreeding = (record: any) => {
+    console.log('Editing breeding record:', record);
+    toast({
+      title: "Edit Breeding Record",
+      description: `Opening edit form for ${record.femaleName}`,
+    });
+  };
+
+  const handleDeleteBreeding = (recordId: string) => {
+    console.log('Deleting breeding record:', recordId);
+    toast({
+      title: "Breeding Record Deleted",
+      description: "Breeding record has been removed",
+    });
+  };
+
+  const handleViewBirth = (record: any) => {
+    console.log('Viewing birth record:', record);
+    toast({
+      title: "Birth Record Details",
+      description: `Viewing details for ${record.calfName}`,
+    });
+  };
+
+  const handleEditBirth = (record: any) => {
+    console.log('Editing birth record:', record);
+    toast({
+      title: "Edit Birth Record",
+      description: `Opening edit form for ${record.calfName}`,
+    });
+  };
+
+  const handleDeleteBirth = (recordId: string) => {
+    console.log('Deleting birth record:', recordId);
+    toast({
+      title: "Birth Record Deleted",
+      description: "Birth record has been removed",
+    });
   };
 
   return (
@@ -137,6 +189,7 @@ const BreedingReproduction = () => {
                   <TableHead>Male/AI</TableHead>
                   <TableHead>Expected Date</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -160,6 +213,19 @@ const BreedingReproduction = () => {
                         {record.status}
                       </Badge>
                     </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-1">
+                        <Button variant="ghost" size="sm" onClick={() => handleViewBreeding(record)}>
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleEditBreeding(record)}>
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteBreeding(record.femaleId)}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -182,6 +248,7 @@ const BreedingReproduction = () => {
                   <TableHead>Mother</TableHead>
                   <TableHead>Birth Date</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -205,6 +272,19 @@ const BreedingReproduction = () => {
                         {record.status}
                       </Badge>
                     </TableCell>
+                    <TableCell>
+                      <div className="flex space-x-1">
+                        <Button variant="ghost" size="sm" onClick={() => handleViewBirth(record)}>
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleEditBirth(record)}>
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteBirth(record.calfId)}>
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -212,6 +292,12 @@ const BreedingReproduction = () => {
           </CardContent>
         </Card>
       </div>
+
+      <ViewBreedingModal 
+        open={viewBreedingModalOpen}
+        onOpenChange={setViewBreedingModalOpen}
+        record={selectedBreedingRecord}
+      />
     </div>
   );
 };
