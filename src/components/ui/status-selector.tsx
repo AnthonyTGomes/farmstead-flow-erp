@@ -60,20 +60,31 @@ const StatusSelector = ({
   return (
     <div className="flex items-center gap-2">
       <Select value={currentStatus} onValueChange={onStatusChange} disabled={disabled}>
-        <SelectTrigger className={`w-auto min-w-[120px] ${size === 'sm' ? 'h-8 text-xs' : 'h-9 text-sm'}`}>
+        <SelectTrigger className={`min-w-[140px] border-2 hover:border-gray-400 transition-colors ${size === 'sm' ? 'h-8 text-xs' : 'h-10 text-sm'} bg-white`}>
           <SelectValue>
-            <Badge className={`${currentOption?.color} flex items-center gap-1`}>
-              {getStatusIcon(currentStatus)}
-              {currentOption?.label || currentStatus}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge className={`${currentOption?.color} flex items-center gap-1 px-2 py-1`}>
+                {getStatusIcon(currentStatus)}
+                <span className="font-medium">{currentOption?.label || currentStatus}</span>
+              </Badge>
+            </div>
           </SelectValue>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-white border-2 shadow-lg z-50 min-w-[160px]">
           {options.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              <div className="flex items-center gap-2">
-                {getStatusIcon(option.value)}
-                <span>{option.label}</span>
+            <SelectItem 
+              key={option.value} 
+              value={option.value}
+              className="hover:bg-gray-50 cursor-pointer py-2"
+            >
+              <div className="flex items-center gap-3 w-full">
+                <div className="flex items-center gap-2">
+                  {getStatusIcon(option.value)}
+                  <span className="font-medium">{option.label}</span>
+                </div>
+                <Badge className={`${option.color} ml-auto text-xs`}>
+                  {option.label}
+                </Badge>
               </div>
             </SelectItem>
           ))}
@@ -82,10 +93,10 @@ const StatusSelector = ({
       
       {canComplete && onCompleteProcess && (
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
           onClick={onCompleteProcess}
-          className="h-8 w-8 p-0 hover:bg-green-100"
+          className="h-8 w-8 p-0 hover:bg-green-50 hover:border-green-300 border-2"
           title="Complete Process"
         >
           <Edit className="w-4 h-4 text-green-600" />

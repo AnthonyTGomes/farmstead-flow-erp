@@ -2,17 +2,19 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, AlertTriangle, Syringe, Heart, Eye, Edit, Trash2 } from 'lucide-react';
+import { Heart, Syringe, Calendar, Eye, Edit, Trash2 } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import VaccinationModal from '@/components/modals/VaccinationModal';
 import HealthModal from '@/components/modals/HealthModal';
 import CompleteVaccinationModal from '@/components/modals/CompleteVaccinationModal';
 import CompleteHealthModal from '@/components/modals/CompleteHealthModal';
+import ViewVaccinationModal from '@/components/modals/ViewVaccinationModal';
+import ViewHealthModal from '@/components/modals/ViewHealthModal';
 import StatusSelector from '@/components/ui/status-selector';
 
 const HealthVaccination = () => {
-  const [vaccinations, setVaccinations] = useState([
+  const [vaccinationSchedules, setVaccinationSchedules] = useState([
     {
       id: 'VAC001',
       animalId: 'COW001',
@@ -20,56 +22,48 @@ const HealthVaccination = () => {
       vaccine: 'FMD Vaccine',
       dueDate: '2024-06-15',
       status: 'Due',
-      lastVaccinated: '2024-03-15'
+      notes: 'Annual vaccination due'
     },
     {
       id: 'VAC002',
       animalId: 'COW002',
-      animalName: 'Thunder',
-      vaccine: 'Brucellosis',
-      dueDate: '2024-06-20',
-      status: 'Overdue',
-      lastVaccinated: '2023-12-20'
-    },
-    {
-      id: 'VAC003',
-      animalId: 'COW003',
       animalName: 'Daisy',
-      vaccine: 'Anthrax',
-      dueDate: '2024-07-01',
-      status: 'Scheduled',
-      lastVaccinated: '2024-01-01'
+      vaccine: 'Brucellosis',
+      dueDate: '2024-06-10',
+      status: 'Overdue',
+      notes: 'Urgent - overdue by 5 days'
     }
   ]);
 
   const [healthRecords, setHealthRecords] = useState([
     {
       id: 'HEALTH001',
-      animalId: 'COW003',
-      animalName: 'Daisy',
-      condition: 'Mastitis',
-      treatment: 'Antibiotics',
-      vet: 'Dr. Smith',
-      date: '2024-05-20',
-      status: 'Under Treatment'
+      animalId: 'COW001',
+      animalName: 'Bella',
+      checkupType: 'Routine Checkup',
+      date: '2024-05-28',
+      status: 'Healthy',
+      temperature: '38.5°C',
+      notes: 'All vitals normal'
     },
     {
       id: 'HEALTH002',
-      animalId: 'COW004',
-      animalName: 'Moo',
-      condition: 'Hoof Rot',
-      treatment: 'Topical Treatment',
-      vet: 'Dr. Johnson',
-      date: '2024-05-18',
-      status: 'Recovered'
+      animalId: 'COW003',
+      animalName: 'Luna',
+      checkupType: 'Sick Visit',
+      date: '2024-05-26',
+      status: 'Under Treatment',
+      temperature: '39.8°C',
+      notes: 'Fever, started antibiotics'
     }
   ]);
 
+  const [viewVaccinationModalOpen, setViewVaccinationModalOpen] = useState(false);
+  const [viewHealthModalOpen, setViewHealthModalOpen] = useState(false);
   const [completeVaccinationModalOpen, setCompleteVaccinationModalOpen] = useState(false);
   const [completeHealthModalOpen, setCompleteHealthModalOpen] = useState(false);
   const [selectedVaccination, setSelectedVaccination] = useState(null);
-  const [selectedHealthRecord, setSelectedHealthRecord] = useState(null);
-
+  const [selectedHealth, setSelectedHealth] = useState(null);
   const { toast } = useToast();
 
   const vaccinationStatusOptions = [
@@ -81,27 +75,22 @@ const HealthVaccination = () => {
   ];
 
   const healthStatusOptions = [
-    { value: 'Under Treatment', label: 'Under Treatment', color: 'bg-orange-100 text-orange-800' },
-    { value: 'Recovered', label: 'Recovered', color: 'bg-green-100 text-green-800' },
-    { value: 'Chronic', label: 'Chronic', color: 'bg-purple-100 text-purple-800' },
-    { value: 'Monitoring', label: 'Monitoring', color: 'bg-blue-100 text-blue-800' }
+    { value: 'Healthy', label: 'Healthy', color: 'bg-green-100 text-green-800' },
+    { value: 'Sick', label: 'Sick', color: 'bg-red-100 text-red-800' },
+    { value: 'Under Treatment', label: 'Under Treatment', color: 'bg-yellow-100 text-yellow-800' },
+    { value: 'Recovered', label: 'Recovered', color: 'bg-blue-100 text-blue-800' },
+    { value: 'Monitoring', label: 'Monitoring', color: 'bg-purple-100 text-purple-800' }
   ];
 
-  const getStatusColor = (status: string) => {
-    const allOptions = [...vaccinationStatusOptions, ...healthStatusOptions];
-    const option = allOptions.find(opt => opt.value === status);
-    return option?.color || 'bg-gray-100 text-gray-800';
-  };
-
-  const handleVaccinationStatusChange = (vaccinationId: string, newStatus: string) => {
-    setVaccinations(prev => prev.map(vac => 
-      vac.id === vaccinationId ? { ...vac, status: newStatus } : vac
+  const handleVaccinationStatusChange = (scheduleId: string, newStatus: string) => {
+    setVaccinationSchedules(prev => prev.map(schedule => 
+      schedule.id === scheduleId ? { ...schedule, status: newStatus } : schedule
     ));
     
-    const vaccination = vaccinations.find(v => v.id === vaccinationId);
+    const schedule = vaccinationSchedules.find(s => s.id === scheduleId);
     toast({
       title: "Vaccination Status Updated",
-      description: `${vaccination?.animalName}'s ${vaccination?.vaccine} status changed to ${newStatus}`,
+      description: `${schedule?.animalName}'s vaccination status changed to ${newStatus}`,
     });
   };
 
@@ -112,24 +101,24 @@ const HealthVaccination = () => {
     
     const record = healthRecords.find(r => r.id === recordId);
     toast({
-      title: "Health Record Updated",
-      description: `${record?.animalName}'s ${record?.condition} status changed to ${newStatus}`,
+      title: "Health Status Updated",
+      description: `${record?.animalName}'s health status changed to ${newStatus}`,
     });
   };
 
-  const handleCompleteVaccination = (vaccination: any) => {
-    setSelectedVaccination(vaccination);
+  const handleCompleteVaccination = (schedule: any) => {
+    setSelectedVaccination(schedule);
     setCompleteVaccinationModalOpen(true);
   };
 
   const handleCompleteHealth = (record: any) => {
-    setSelectedHealthRecord(record);
+    setSelectedHealth(record);
     setCompleteHealthModalOpen(true);
   };
 
-  const handleVaccinationComplete = (vaccinationId: string, data: any) => {
-    setVaccinations(prev => prev.map(vac => 
-      vac.id === vaccinationId ? { ...vac, ...data } : vac
+  const handleVaccinationComplete = (scheduleId: string, data: any) => {
+    setVaccinationSchedules(prev => prev.map(schedule => 
+      schedule.id === scheduleId ? { ...schedule, ...data } : schedule
     ));
   };
 
@@ -139,39 +128,37 @@ const HealthVaccination = () => {
     ));
   };
 
-  const handleViewVaccination = (vaccination: any) => {
-    toast({
-      title: "Vaccination Details",
-      description: `Viewing details for ${vaccination.animalName} - ${vaccination.vaccine}`,
-    });
-  };
-
-  const handleEditVaccination = (vaccination: any) => {
-    toast({
-      title: "Edit Vaccination",
-      description: `Opening edit form for ${vaccination.animalName} - ${vaccination.vaccine}`,
-    });
-  };
-
-  const handleDeleteVaccination = (vaccinationId: string) => {
-    setVaccinations(prev => prev.filter(vac => vac.id !== vaccinationId));
-    toast({
-      title: "Vaccination Record Deleted",
-      description: "Vaccination record has been removed",
-    });
+  const handleViewVaccination = (schedule: any) => {
+    setSelectedVaccination(schedule);
+    setViewVaccinationModalOpen(true);
   };
 
   const handleViewHealth = (record: any) => {
+    setSelectedHealth(record);
+    setViewHealthModalOpen(true);
+  };
+
+  const handleEditVaccination = (schedule: any) => {
+    console.log('Editing vaccination:', schedule);
     toast({
-      title: "Health Record Details",
-      description: `Viewing details for ${record.animalName} - ${record.condition}`,
+      title: "Edit Vaccination",
+      description: `Opening edit form for ${schedule.animalName}`,
+    });
+  };
+
+  const handleDeleteVaccination = (scheduleId: string) => {
+    setVaccinationSchedules(prev => prev.filter(schedule => schedule.id !== scheduleId));
+    toast({
+      title: "Vaccination Deleted",
+      description: "Vaccination schedule has been removed",
     });
   };
 
   const handleEditHealth = (record: any) => {
+    console.log('Editing health record:', record);
     toast({
       title: "Edit Health Record",
-      description: `Opening edit form for ${record.animalName} - ${record.condition}`,
+      description: `Opening edit form for ${record.animalName}`,
     });
   };
 
@@ -193,25 +180,13 @@ const HealthVaccination = () => {
         </div>
       </div>
 
-      
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-2">
-              <Heart className="w-8 h-8 text-green-600" />
-              <div>
-                <div className="text-2xl font-bold text-green-600">94%</div>
-                <div className="text-sm text-gray-600">Healthy Animals</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <Syringe className="w-8 h-8 text-blue-600" />
               <div>
-                <div className="text-2xl font-bold text-blue-600">23</div>
+                <div className="text-2xl font-bold text-blue-600">12</div>
                 <div className="text-sm text-gray-600">Due Vaccinations</div>
               </div>
             </div>
@@ -220,10 +195,10 @@ const HealthVaccination = () => {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <AlertTriangle className="w-8 h-8 text-red-600" />
+              <Heart className="w-8 h-8 text-red-600" />
               <div>
-                <div className="text-2xl font-bold text-red-600">8</div>
-                <div className="text-sm text-gray-600">Health Alerts</div>
+                <div className="text-2xl font-bold text-red-600">3</div>
+                <div className="text-sm text-gray-600">Sick Animals</div>
               </div>
             </div>
           </CardContent>
@@ -231,10 +206,23 @@ const HealthVaccination = () => {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <Calendar className="w-8 h-8 text-orange-600" />
+              <Calendar className="w-8 h-8 text-green-600" />
               <div>
-                <div className="text-2xl font-bold text-orange-600">15</div>
-                <div className="text-sm text-gray-600">Vet Visits</div>
+                <div className="text-2xl font-bold text-green-600">85</div>
+                <div className="text-sm text-gray-600">Healthy Animals</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                <span className="text-purple-600 font-bold">%</span>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-purple-600">96%</div>
+                <div className="text-sm text-gray-600">Health Rate</div>
               </div>
             </div>
           </CardContent>
@@ -261,34 +249,34 @@ const HealthVaccination = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {vaccinations.map((vac) => (
-                  <TableRow key={vac.id}>
+                {vaccinationSchedules.map((schedule) => (
+                  <TableRow key={schedule.id}>
                     <TableCell>
                       <div>
-                        <div className="font-medium">{vac.animalName}</div>
-                        <div className="text-sm text-gray-600">{vac.animalId}</div>
+                        <div className="font-medium">{schedule.animalName}</div>
+                        <div className="text-sm text-gray-600">{schedule.animalId}</div>
                       </div>
                     </TableCell>
-                    <TableCell>{vac.vaccine}</TableCell>
-                    <TableCell>{vac.dueDate}</TableCell>
+                    <TableCell>{schedule.vaccine}</TableCell>
+                    <TableCell>{schedule.dueDate}</TableCell>
                     <TableCell>
                       <StatusSelector
-                        currentStatus={vac.status}
+                        currentStatus={schedule.status}
                         options={vaccinationStatusOptions}
-                        onStatusChange={(newStatus) => handleVaccinationStatusChange(vac.id, newStatus)}
-                        onCompleteProcess={() => handleCompleteVaccination(vac)}
+                        onStatusChange={(newStatus) => handleVaccinationStatusChange(schedule.id, newStatus)}
+                        onCompleteProcess={() => handleCompleteVaccination(schedule)}
                         size="sm"
                       />
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-1">
-                        <Button variant="ghost" size="sm" onClick={() => handleViewVaccination(vac)}>
+                        <Button variant="ghost" size="sm" onClick={() => handleViewVaccination(schedule)}>
                           <Eye className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleEditVaccination(vac)}>
+                        <Button variant="ghost" size="sm" onClick={() => handleEditVaccination(schedule)}>
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDeleteVaccination(vac.id)}>
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteVaccination(schedule.id)}>
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
@@ -312,8 +300,8 @@ const HealthVaccination = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Animal</TableHead>
-                  <TableHead>Condition</TableHead>
-                  <TableHead>Treatment</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Date</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -327,8 +315,8 @@ const HealthVaccination = () => {
                         <div className="text-sm text-gray-600">{record.animalId}</div>
                       </div>
                     </TableCell>
-                    <TableCell>{record.condition}</TableCell>
-                    <TableCell>{record.treatment}</TableCell>
+                    <TableCell>{record.checkupType}</TableCell>
+                    <TableCell>{record.date}</TableCell>
                     <TableCell>
                       <StatusSelector
                         currentStatus={record.status}
@@ -359,17 +347,30 @@ const HealthVaccination = () => {
         </Card>
       </div>
 
+      {/* Modals */}
+      <ViewVaccinationModal 
+        open={viewVaccinationModalOpen}
+        onOpenChange={setViewVaccinationModalOpen}
+        schedule={selectedVaccination}
+      />
+
+      <ViewHealthModal 
+        open={viewHealthModalOpen}
+        onOpenChange={setViewHealthModalOpen}
+        record={selectedHealth}
+      />
+
       <CompleteVaccinationModal
         open={completeVaccinationModalOpen}
         onOpenChange={setCompleteVaccinationModalOpen}
-        vaccination={selectedVaccination}
+        schedule={selectedVaccination}
         onComplete={handleVaccinationComplete}
       />
 
       <CompleteHealthModal
         open={completeHealthModalOpen}
         onOpenChange={setCompleteHealthModalOpen}
-        healthRecord={selectedHealthRecord}
+        record={selectedHealth}
         onComplete={handleHealthComplete}
       />
     </div>
