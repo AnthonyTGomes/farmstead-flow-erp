@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast';
 import BreedingModal from '@/components/modals/BreedingModal';
 import ViewBreedingModal from '@/components/modals/ViewBreedingModal';
+import CompleteBreedingModal from '@/components/modals/CompleteBreedingModal';
 import StatusSelector from '@/components/ui/status-selector';
 
 const BreedingReproduction = () => {
@@ -61,6 +63,7 @@ const BreedingReproduction = () => {
   ]);
 
   const [viewBreedingModalOpen, setViewBreedingModalOpen] = useState(false);
+  const [completeBreedingModalOpen, setCompleteBreedingModalOpen] = useState(false);
   const [selectedBreedingRecord, setSelectedBreedingRecord] = useState(null);
   const { toast } = useToast();
 
@@ -107,6 +110,17 @@ const BreedingReproduction = () => {
       title: "Birth Record Updated",
       description: `${record?.calfName}'s status changed to ${newStatus}`,
     });
+  };
+
+  const handleCompleteBreeding = (record: any) => {
+    setSelectedBreedingRecord(record);
+    setCompleteBreedingModalOpen(true);
+  };
+
+  const handleBreedingComplete = (recordId: string, data: any) => {
+    setBreedingRecords(prev => prev.map(record => 
+      record.id === recordId ? { ...record, ...data } : record
+    ));
   };
 
   const handleViewBreeding = (record: any) => {
@@ -254,6 +268,7 @@ const BreedingReproduction = () => {
                         currentStatus={record.status}
                         options={breedingStatusOptions}
                         onStatusChange={(newStatus) => handleBreedingStatusChange(record.id, newStatus)}
+                        onCompleteProcess={() => handleCompleteBreeding(record)}
                         size="sm"
                       />
                     </TableCell>
@@ -344,6 +359,13 @@ const BreedingReproduction = () => {
         open={viewBreedingModalOpen}
         onOpenChange={setViewBreedingModalOpen}
         record={selectedBreedingRecord}
+      />
+
+      <CompleteBreedingModal
+        open={completeBreedingModalOpen}
+        onOpenChange={setCompleteBreedingModalOpen}
+        breedingRecord={selectedBreedingRecord}
+        onComplete={handleBreedingComplete}
       />
     </div>
   );

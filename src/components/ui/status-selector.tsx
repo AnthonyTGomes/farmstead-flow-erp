@@ -2,7 +2,8 @@
 import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Check, Clock, AlertTriangle, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Check, Clock, AlertTriangle, X, Edit } from 'lucide-react';
 
 interface StatusOption {
   value: string;
@@ -15,6 +16,7 @@ interface StatusSelectorProps {
   currentStatus: string;
   options: StatusOption[];
   onStatusChange: (newStatus: string) => void;
+  onCompleteProcess?: () => void;
   disabled?: boolean;
   size?: 'sm' | 'default';
 }
@@ -23,6 +25,7 @@ const StatusSelector = ({
   currentStatus, 
   options, 
   onStatusChange, 
+  onCompleteProcess,
   disabled = false,
   size = 'default' 
 }: StatusSelectorProps) => {
@@ -42,6 +45,7 @@ const StatusSelector = ({
       case 'overdue':
       case 'urgent':
       case 'sick':
+      case 'under treatment':
         return <AlertTriangle className="w-3 h-3" />;
       case 'cancelled':
       case 'failed':
@@ -51,27 +55,43 @@ const StatusSelector = ({
     }
   };
 
+  const canComplete = ['Due', 'Overdue', 'Scheduled', 'Under Treatment', 'Breeding', 'Pregnant'].includes(currentStatus);
+
   return (
-    <Select value={currentStatus} onValueChange={onStatusChange} disabled={disabled}>
-      <SelectTrigger className={`w-auto min-w-[120px] ${size === 'sm' ? 'h-8 text-xs' : 'h-9 text-sm'}`}>
-        <SelectValue>
-          <Badge className={`${currentOption?.color} flex items-center gap-1`}>
-            {getStatusIcon(currentStatus)}
-            {currentOption?.label || currentStatus}
-          </Badge>
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent>
-        {options.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
-            <div className="flex items-center gap-2">
-              {getStatusIcon(option.value)}
-              <span>{option.label}</span>
-            </div>
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="flex items-center gap-2">
+      <Select value={currentStatus} onValueChange={onStatusChange} disabled={disabled}>
+        <SelectTrigger className={`w-auto min-w-[120px] ${size === 'sm' ? 'h-8 text-xs' : 'h-9 text-sm'}`}>
+          <SelectValue>
+            <Badge className={`${currentOption?.color} flex items-center gap-1`}>
+              {getStatusIcon(currentStatus)}
+              {currentOption?.label || currentStatus}
+            </Badge>
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              <div className="flex items-center gap-2">
+                {getStatusIcon(option.value)}
+                <span>{option.label}</span>
+              </div>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      
+      {canComplete && onCompleteProcess && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onCompleteProcess}
+          className="h-8 w-8 p-0 hover:bg-green-100"
+          title="Complete Process"
+        >
+          <Edit className="w-4 h-4 text-green-600" />
+        </Button>
+      )}
+    </div>
   );
 };
 

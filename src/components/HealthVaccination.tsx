@@ -7,6 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast';
 import VaccinationModal from '@/components/modals/VaccinationModal';
 import HealthModal from '@/components/modals/HealthModal';
+import CompleteVaccinationModal from '@/components/modals/CompleteVaccinationModal';
+import CompleteHealthModal from '@/components/modals/CompleteHealthModal';
 import StatusSelector from '@/components/ui/status-selector';
 
 const HealthVaccination = () => {
@@ -63,6 +65,11 @@ const HealthVaccination = () => {
     }
   ]);
 
+  const [completeVaccinationModalOpen, setCompleteVaccinationModalOpen] = useState(false);
+  const [completeHealthModalOpen, setCompleteHealthModalOpen] = useState(false);
+  const [selectedVaccination, setSelectedVaccination] = useState(null);
+  const [selectedHealthRecord, setSelectedHealthRecord] = useState(null);
+
   const { toast } = useToast();
 
   const vaccinationStatusOptions = [
@@ -108,6 +115,28 @@ const HealthVaccination = () => {
       title: "Health Record Updated",
       description: `${record?.animalName}'s ${record?.condition} status changed to ${newStatus}`,
     });
+  };
+
+  const handleCompleteVaccination = (vaccination: any) => {
+    setSelectedVaccination(vaccination);
+    setCompleteVaccinationModalOpen(true);
+  };
+
+  const handleCompleteHealth = (record: any) => {
+    setSelectedHealthRecord(record);
+    setCompleteHealthModalOpen(true);
+  };
+
+  const handleVaccinationComplete = (vaccinationId: string, data: any) => {
+    setVaccinations(prev => prev.map(vac => 
+      vac.id === vaccinationId ? { ...vac, ...data } : vac
+    ));
+  };
+
+  const handleHealthComplete = (recordId: string, data: any) => {
+    setHealthRecords(prev => prev.map(record => 
+      record.id === recordId ? { ...record, ...data } : record
+    ));
   };
 
   const handleViewVaccination = (vaccination: any) => {
@@ -247,6 +276,7 @@ const HealthVaccination = () => {
                         currentStatus={vac.status}
                         options={vaccinationStatusOptions}
                         onStatusChange={(newStatus) => handleVaccinationStatusChange(vac.id, newStatus)}
+                        onCompleteProcess={() => handleCompleteVaccination(vac)}
                         size="sm"
                       />
                     </TableCell>
@@ -304,6 +334,7 @@ const HealthVaccination = () => {
                         currentStatus={record.status}
                         options={healthStatusOptions}
                         onStatusChange={(newStatus) => handleHealthStatusChange(record.id, newStatus)}
+                        onCompleteProcess={() => handleCompleteHealth(record)}
                         size="sm"
                       />
                     </TableCell>
@@ -327,6 +358,20 @@ const HealthVaccination = () => {
           </CardContent>
         </Card>
       </div>
+
+      <CompleteVaccinationModal
+        open={completeVaccinationModalOpen}
+        onOpenChange={setCompleteVaccinationModalOpen}
+        vaccination={selectedVaccination}
+        onComplete={handleVaccinationComplete}
+      />
+
+      <CompleteHealthModal
+        open={completeHealthModalOpen}
+        onOpenChange={setCompleteHealthModalOpen}
+        healthRecord={selectedHealthRecord}
+        onComplete={handleHealthComplete}
+      />
     </div>
   );
 };
