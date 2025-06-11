@@ -13,17 +13,18 @@ import { useToast } from '@/hooks/use-toast';
 interface CompleteHealthModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  healthRecord: {
+  record: {
     id: string;
     animalId: string;
     animalName: string;
-    condition: string;
+    checkupType?: string;
+    condition?: string;
     status: string;
   } | null;
   onComplete: (recordId: string, data: any) => void;
 }
 
-const CompleteHealthModal = ({ open, onOpenChange, healthRecord, onComplete }: CompleteHealthModalProps) => {
+const CompleteHealthModal = ({ open, onOpenChange, record, onComplete }: CompleteHealthModalProps) => {
   const [formData, setFormData] = useState({
     treatmentDate: '',
     veterinarian: '',
@@ -39,16 +40,16 @@ const CompleteHealthModal = ({ open, onOpenChange, healthRecord, onComplete }: C
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!healthRecord) return;
+    if (!record) return;
 
-    onComplete(healthRecord.id, {
+    onComplete(record.id, {
       ...formData,
       status: formData.outcome
     });
 
     toast({
       title: "Treatment Completed",
-      description: `Treatment for ${healthRecord.condition} completed for ${healthRecord.animalName}`,
+      description: `Treatment for ${record.condition || record.checkupType} completed for ${record.animalName}`,
     });
 
     setFormData({
@@ -64,7 +65,7 @@ const CompleteHealthModal = ({ open, onOpenChange, healthRecord, onComplete }: C
     onOpenChange(false);
   };
 
-  if (!healthRecord) return null;
+  if (!record) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -80,10 +81,12 @@ const CompleteHealthModal = ({ open, onOpenChange, healthRecord, onComplete }: C
 
         <div className="mb-4 p-4 bg-gray-50 rounded-lg">
           <div className="flex justify-between items-center mb-2">
-            <h3 className="font-semibold">{healthRecord.animalName} ({healthRecord.animalId})</h3>
-            <Badge className="bg-orange-100 text-orange-800">{healthRecord.status}</Badge>
+            <h3 className="font-semibold">{record.animalName} ({record.animalId})</h3>
+            <Badge className="bg-orange-100 text-orange-800">{record.status}</Badge>
           </div>
-          <p className="text-sm text-gray-600">Condition: {healthRecord.condition}</p>
+          <p className="text-sm text-gray-600">
+            {record.condition ? `Condition: ${record.condition}` : `Type: ${record.checkupType}`}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

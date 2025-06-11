@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 interface CompleteVaccinationModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  vaccination: {
+  schedule: {
     id: string;
     animalId: string;
     animalName: string;
@@ -23,7 +23,7 @@ interface CompleteVaccinationModalProps {
   onComplete: (vaccinationId: string, data: any) => void;
 }
 
-const CompleteVaccinationModal = ({ open, onOpenChange, vaccination, onComplete }: CompleteVaccinationModalProps) => {
+const CompleteVaccinationModal = ({ open, onOpenChange, schedule, onComplete }: CompleteVaccinationModalProps) => {
   const [formData, setFormData] = useState({
     completionDate: '',
     veterinarian: '',
@@ -37,16 +37,16 @@ const CompleteVaccinationModal = ({ open, onOpenChange, vaccination, onComplete 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!vaccination) return;
+    if (!schedule) return;
 
-    onComplete(vaccination.id, {
+    onComplete(schedule.id, {
       ...formData,
       status: 'Completed'
     });
 
     toast({
       title: "Vaccination Completed",
-      description: `${vaccination.vaccine} vaccination completed for ${vaccination.animalName}`,
+      description: `${schedule.vaccine} vaccination completed for ${schedule.animalName}`,
     });
 
     setFormData({
@@ -60,7 +60,7 @@ const CompleteVaccinationModal = ({ open, onOpenChange, vaccination, onComplete 
     onOpenChange(false);
   };
 
-  if (!vaccination) return null;
+  if (!schedule) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -76,10 +76,10 @@ const CompleteVaccinationModal = ({ open, onOpenChange, vaccination, onComplete 
 
         <div className="mb-4 p-4 bg-gray-50 rounded-lg">
           <div className="flex justify-between items-center mb-2">
-            <h3 className="font-semibold">{vaccination.animalName} ({vaccination.animalId})</h3>
-            <Badge className="bg-blue-100 text-blue-800">{vaccination.status}</Badge>
+            <h3 className="font-semibold">{schedule.animalName} ({schedule.animalId})</h3>
+            <Badge className="bg-blue-100 text-blue-800">{schedule.status}</Badge>
           </div>
-          <p className="text-sm text-gray-600">Vaccine: {vaccination.vaccine}</p>
+          <p className="text-sm text-gray-600">Vaccine: {schedule.vaccine}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
