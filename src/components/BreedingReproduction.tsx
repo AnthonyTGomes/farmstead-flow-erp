@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, Baby, Calendar, Eye, Edit, Trash2 } from 'lucide-react';
+import { Heart, Baby, Calendar, Eye, Edit, Trash2, CheckCircle } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import BreedingModal from '@/components/modals/BreedingModal';
@@ -168,6 +167,10 @@ const BreedingReproduction = () => {
     });
   };
 
+  const canCompleteBreeding = (status: string) => {
+    return ['Breeding', 'Confirmed', 'Pregnant'].includes(status);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -268,12 +271,22 @@ const BreedingReproduction = () => {
                         currentStatus={record.status}
                         options={breedingStatusOptions}
                         onStatusChange={(newStatus) => handleBreedingStatusChange(record.id, newStatus)}
-                        onCompleteProcess={() => handleCompleteBreeding(record)}
                         size="sm"
                       />
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-1">
+                        {canCompleteBreeding(record.status) && (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleCompleteBreeding(record)}
+                            className="text-green-600 border-green-300 hover:bg-green-50"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            Complete
+                          </Button>
+                        )}
                         <Button variant="ghost" size="sm" onClick={() => handleViewBreeding(record)}>
                           <Eye className="w-4 h-4" />
                         </Button>

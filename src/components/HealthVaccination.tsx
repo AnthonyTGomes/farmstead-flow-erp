@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, Syringe, Calendar, Eye, Edit, Trash2 } from 'lucide-react';
+import { Heart, Syringe, Calendar, Eye, Edit, Trash2, CheckCircle } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import VaccinationModal from '@/components/modals/VaccinationModal';
@@ -170,6 +170,14 @@ const HealthVaccination = () => {
     });
   };
 
+  const canCompleteVaccination = (status: string) => {
+    return ['Due', 'Overdue', 'Scheduled'].includes(status);
+  };
+
+  const canCompleteHealth = (status: string) => {
+    return ['Sick', 'Under Treatment'].includes(status);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -264,12 +272,22 @@ const HealthVaccination = () => {
                         currentStatus={schedule.status}
                         options={vaccinationStatusOptions}
                         onStatusChange={(newStatus) => handleVaccinationStatusChange(schedule.id, newStatus)}
-                        onCompleteProcess={() => handleCompleteVaccination(schedule)}
                         size="sm"
                       />
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-1">
+                        {canCompleteVaccination(schedule.status) && (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleCompleteVaccination(schedule)}
+                            className="text-green-600 border-green-300 hover:bg-green-50"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            Complete
+                          </Button>
+                        )}
                         <Button variant="ghost" size="sm" onClick={() => handleViewVaccination(schedule)}>
                           <Eye className="w-4 h-4" />
                         </Button>
@@ -322,12 +340,22 @@ const HealthVaccination = () => {
                         currentStatus={record.status}
                         options={healthStatusOptions}
                         onStatusChange={(newStatus) => handleHealthStatusChange(record.id, newStatus)}
-                        onCompleteProcess={() => handleCompleteHealth(record)}
                         size="sm"
                       />
                     </TableCell>
                     <TableCell>
                       <div className="flex space-x-1">
+                        {canCompleteHealth(record.status) && (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleCompleteHealth(record)}
+                            className="text-green-600 border-green-300 hover:bg-green-50"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            Complete
+                          </Button>
+                        )}
                         <Button variant="ghost" size="sm" onClick={() => handleViewHealth(record)}>
                           <Eye className="w-4 h-4" />
                         </Button>
