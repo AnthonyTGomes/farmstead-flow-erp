@@ -17,6 +17,7 @@ interface StatusSelectorProps {
   onStatusChange: (newStatus: string) => void;
   disabled?: boolean;
   size?: 'sm' | 'default';
+  readOnly?: boolean;
 }
 
 const StatusSelector = ({ 
@@ -24,7 +25,8 @@ const StatusSelector = ({
   options, 
   onStatusChange, 
   disabled = false,
-  size = 'default' 
+  size = 'default',
+  readOnly = false
 }: StatusSelectorProps) => {
   const currentOption = options.find(option => option.value === currentStatus);
   
@@ -52,33 +54,36 @@ const StatusSelector = ({
     }
   };
 
+  // If read-only, just show a badge
+  if (readOnly) {
+    return (
+      <Badge className={`${currentOption?.color} flex items-center gap-1 px-2 py-1`}>
+        {getStatusIcon(currentStatus)}
+        <span className="font-medium">{currentOption?.label || currentStatus}</span>
+      </Badge>
+    );
+  }
+
   return (
     <Select value={currentStatus} onValueChange={onStatusChange} disabled={disabled}>
-      <SelectTrigger className={`min-w-[140px] border-2 hover:border-gray-400 transition-colors ${size === 'sm' ? 'h-8 text-xs' : 'h-10 text-sm'} bg-white`}>
+      <SelectTrigger className={`min-w-[120px] border hover:border-gray-400 transition-colors ${size === 'sm' ? 'h-8 text-xs' : 'h-9 text-sm'} bg-white`}>
         <SelectValue>
-          <div className="flex items-center gap-2">
-            <Badge className={`${currentOption?.color} flex items-center gap-1 px-2 py-1`}>
-              {getStatusIcon(currentStatus)}
-              <span className="font-medium">{currentOption?.label || currentStatus}</span>
-            </Badge>
-          </div>
+          <Badge className={`${currentOption?.color} flex items-center gap-1 px-2 py-1`}>
+            {getStatusIcon(currentStatus)}
+            <span className="font-medium">{currentOption?.label || currentStatus}</span>
+          </Badge>
         </SelectValue>
       </SelectTrigger>
-      <SelectContent className="bg-white border-2 shadow-lg z-50 min-w-[160px]">
+      <SelectContent className="bg-white border shadow-lg z-50 min-w-[140px]">
         {options.map((option) => (
           <SelectItem 
             key={option.value} 
             value={option.value}
             className="hover:bg-gray-50 cursor-pointer py-2"
           >
-            <div className="flex items-center gap-3 w-full">
-              <div className="flex items-center gap-2">
-                {getStatusIcon(option.value)}
-                <span className="font-medium">{option.label}</span>
-              </div>
-              <Badge className={`${option.color} ml-auto text-xs`}>
-                {option.label}
-              </Badge>
+            <div className="flex items-center gap-2">
+              {getStatusIcon(option.value)}
+              <span className="font-medium">{option.label}</span>
             </div>
           </SelectItem>
         ))}

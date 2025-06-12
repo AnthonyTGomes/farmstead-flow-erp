@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -247,7 +248,7 @@ const BreedingReproduction = () => {
                   <TableHead>Male/AI</TableHead>
                   <TableHead>Expected Date</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -271,11 +272,12 @@ const BreedingReproduction = () => {
                         currentStatus={record.status}
                         options={breedingStatusOptions}
                         onStatusChange={(newStatus) => handleBreedingStatusChange(record.id, newStatus)}
+                        readOnly={canCompleteBreeding(record.status)}
                         size="sm"
                       />
                     </TableCell>
                     <TableCell>
-                      <div className="flex space-x-1">
+                      <div className="flex justify-end space-x-1">
                         {canCompleteBreeding(record.status) && (
                           <Button 
                             variant="outline" 
@@ -320,7 +322,7 @@ const BreedingReproduction = () => {
                   <TableHead>Mother</TableHead>
                   <TableHead>Birth Date</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -348,7 +350,7 @@ const BreedingReproduction = () => {
                       />
                     </TableCell>
                     <TableCell>
-                      <div className="flex space-x-1">
+                      <div className="flex justify-end space-x-1">
                         <Button variant="ghost" size="sm" onClick={() => handleViewBirth(record)}>
                           <Eye className="w-4 h-4" />
                         </Button>

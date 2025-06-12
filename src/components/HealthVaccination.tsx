@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -253,7 +254,7 @@ const HealthVaccination = () => {
                   <TableHead>Vaccine</TableHead>
                   <TableHead>Due Date</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -272,11 +273,12 @@ const HealthVaccination = () => {
                         currentStatus={schedule.status}
                         options={vaccinationStatusOptions}
                         onStatusChange={(newStatus) => handleVaccinationStatusChange(schedule.id, newStatus)}
+                        readOnly={canCompleteVaccination(schedule.status)}
                         size="sm"
                       />
                     </TableCell>
                     <TableCell>
-                      <div className="flex space-x-1">
+                      <div className="flex justify-end space-x-1">
                         {canCompleteVaccination(schedule.status) && (
                           <Button 
                             variant="outline" 
@@ -321,7 +323,7 @@ const HealthVaccination = () => {
                   <TableHead>Type</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -340,11 +342,12 @@ const HealthVaccination = () => {
                         currentStatus={record.status}
                         options={healthStatusOptions}
                         onStatusChange={(newStatus) => handleHealthStatusChange(record.id, newStatus)}
+                        readOnly={canCompleteHealth(record.status)}
                         size="sm"
                       />
                     </TableCell>
                     <TableCell>
-                      <div className="flex space-x-1">
+                      <div className="flex justify-end space-x-1">
                         {canCompleteHealth(record.status) && (
                           <Button 
                             variant="outline" 
