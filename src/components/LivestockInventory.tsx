@@ -1,9 +1,10 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Search, Filter, Eye, Edit, Trash2 } from 'lucide-react';
+import { Search, Filter, Eye, Edit, Trash2, Users, Heart, AlertTriangle, Shield } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import AddAnimalModal from '@/components/modals/AddAnimalModal';
@@ -101,26 +102,54 @@ const LivestockInventory = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-green-600">247</div>
-            <div className="text-sm text-gray-600">Total Animals</div>
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <Users className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-green-600">247</div>
+                <div className="text-sm text-gray-600">Total Animals</div>
+              </div>
+            </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-blue-600">232</div>
-            <div className="text-sm text-gray-600">Active</div>
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Heart className="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-blue-600">232</div>
+                <div className="text-sm text-gray-600">Active</div>
+              </div>
+            </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-red-600">8</div>
-            <div className="text-sm text-gray-600">Sick</div>
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-red-100 rounded-lg">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-red-600">8</div>
+                <div className="text-sm text-gray-600">Sick</div>
+              </div>
+            </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <div className="text-2xl font-bold text-orange-600">7</div>
-            <div className="text-sm text-gray-600">Quarantine</div>
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <Shield className="w-6 h-6 text-orange-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-orange-600">7</div>
+                <div className="text-sm text-gray-600">Quarantine</div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
