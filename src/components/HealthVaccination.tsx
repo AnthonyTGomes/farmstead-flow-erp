@@ -224,8 +224,17 @@ const HealthVaccination = () => {
     return ['Sick', 'Under Treatment'].includes(status);
   };
 
-  const uniqueVaccinationStatuses = [...new Set(vaccinationSchedules.map(schedule => schedule.status))];
-  const uniqueHealthStatuses = [...new Set(healthRecords.map(record => record.status))];
+  // Remove empty/falsy status from list of filter statuses
+  const uniqueVaccinationStatuses = [
+    ...new Set(
+      vaccinationSchedules.map(schedule => schedule.status).filter(Boolean).filter(s => s.trim() !== '')
+    ),
+  ];
+  const uniqueHealthStatuses = [
+    ...new Set(
+      healthRecords.map(record => record.status).filter(Boolean).filter(s => s.trim() !== '')
+    ),
+  ];
 
   const getStatusColor = (status: string) => {
     const vaccinationOption = vaccinationStatusOptions.find(opt => opt.value === status);
