@@ -47,9 +47,9 @@ const LivestockInventory = () => {
   ]);
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('');
-  const [filterBreed, setFilterBreed] = useState('');
-  const [filterGender, setFilterGender] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterBreed, setFilterBreed] = useState('all');
+  const [filterGender, setFilterGender] = useState('all');
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedAnimal, setSelectedAnimal] = useState(null);
   const { toast } = useToast();
@@ -88,9 +88,9 @@ const LivestockInventory = () => {
     const matchesSearch = animal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          animal.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          animal.breed.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === '' || animal.status === filterStatus;
-    const matchesBreed = filterBreed === '' || animal.breed === filterBreed;
-    const matchesGender = filterGender === '' || animal.gender === filterGender;
+    const matchesStatus = filterStatus === 'all' || animal.status === filterStatus;
+    const matchesBreed = filterBreed === 'all' || animal.breed === filterBreed;
+    const matchesGender = filterGender === 'all' || animal.gender === filterGender;
     return matchesSearch && matchesStatus && matchesBreed && matchesGender;
   });
 
@@ -194,7 +194,7 @@ const LivestockInventory = () => {
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value="all">All Status</SelectItem>
                   {uniqueStatuses.map(status => (
                     <SelectItem key={status} value={status}>{status}</SelectItem>
                   ))}
@@ -205,7 +205,7 @@ const LivestockInventory = () => {
                   <SelectValue placeholder="Breed" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Breeds</SelectItem>
+                  <SelectItem value="all">All Breeds</SelectItem>
                   {uniqueBreeds.map(breed => (
                     <SelectItem key={breed} value={breed}>{breed}</SelectItem>
                   ))}
@@ -216,7 +216,7 @@ const LivestockInventory = () => {
                   <SelectValue placeholder="Gender" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Genders</SelectItem>
+                  <SelectItem value="all">All Genders</SelectItem>
                   <SelectItem value="Male">Male</SelectItem>
                   <SelectItem value="Female">Female</SelectItem>
                 </SelectContent>

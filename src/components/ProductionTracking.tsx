@@ -66,9 +66,9 @@ const ProductionTracking = () => {
   ]);
 
   const [milkSearchTerm, setMilkSearchTerm] = useState('');
-  const [milkQualityFilter, setMilkQualityFilter] = useState('');
+  const [milkQualityFilter, setMilkQualityFilter] = useState('all');
   const [feedSearchTerm, setFeedSearchTerm] = useState('');
-  const [feedTypeFilter, setFeedTypeFilter] = useState('');
+  const [feedTypeFilter, setFeedTypeFilter] = useState('all');
 
   const getQualityColor = (quality: string) => {
     switch (quality) {
@@ -83,14 +83,14 @@ const ProductionTracking = () => {
   const filteredMilkRecords = milkRecords.filter(record => {
     const matchesSearch = record.animalName.toLowerCase().includes(milkSearchTerm.toLowerCase()) ||
                          record.animalId.toLowerCase().includes(milkSearchTerm.toLowerCase());
-    const matchesQuality = milkQualityFilter === '' || record.quality === milkQualityFilter;
+    const matchesQuality = milkQualityFilter === 'all' || record.quality === milkQualityFilter;
     return matchesSearch && matchesQuality;
   });
 
   const filteredFeedRecords = feedRecords.filter(record => {
     const matchesSearch = record.feedType.toLowerCase().includes(feedSearchTerm.toLowerCase()) ||
                          record.supplier.toLowerCase().includes(feedSearchTerm.toLowerCase());
-    const matchesType = feedTypeFilter === '' || record.feedType === feedTypeFilter;
+    const matchesType = feedTypeFilter === 'all' || record.feedType === feedTypeFilter;
     return matchesSearch && matchesType;
   });
 
@@ -200,7 +200,7 @@ const ProductionTracking = () => {
                     <SelectValue placeholder="Quality" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All</SelectItem>
+                    <SelectItem value="all">All</SelectItem>
                     {uniqueQualities.map(quality => (
                       <SelectItem key={quality} value={quality}>{quality}</SelectItem>
                     ))}
@@ -305,7 +305,7 @@ const ProductionTracking = () => {
                     <SelectValue placeholder="Feed Type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Types</SelectItem>
+                    <SelectItem value="all">All Types</SelectItem>
                     {uniqueFeedTypes.map(type => (
                       <SelectItem key={type} value={type}>{type}</SelectItem>
                     ))}

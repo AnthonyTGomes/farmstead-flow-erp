@@ -66,9 +66,9 @@ const BreedingReproduction = () => {
   ]);
 
   const [breedingSearchTerm, setBreedingSearchTerm] = useState('');
-  const [breedingStatusFilter, setBreedingStatusFilter] = useState('');
+  const [breedingStatusFilter, setBreedingStatusFilter] = useState('all');
   const [birthSearchTerm, setBirthSearchTerm] = useState('');
-  const [birthStatusFilter, setBirthStatusFilter] = useState('');
+  const [birthStatusFilter, setBirthStatusFilter] = useState('all');
   const [viewBreedingModalOpen, setViewBreedingModalOpen] = useState(false);
   const [completeBreedingModalOpen, setCompleteBreedingModalOpen] = useState(false);
   const [selectedBreedingRecord, setSelectedBreedingRecord] = useState(null);
@@ -93,7 +93,7 @@ const BreedingReproduction = () => {
     const matchesSearch = record.femaleName.toLowerCase().includes(breedingSearchTerm.toLowerCase()) ||
                          record.femaleId.toLowerCase().includes(breedingSearchTerm.toLowerCase()) ||
                          record.maleName.toLowerCase().includes(breedingSearchTerm.toLowerCase());
-    const matchesStatus = breedingStatusFilter === '' || record.status === breedingStatusFilter;
+    const matchesStatus = breedingStatusFilter === 'all' || record.status === breedingStatusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -101,7 +101,7 @@ const BreedingReproduction = () => {
     const matchesSearch = record.calfName.toLowerCase().includes(birthSearchTerm.toLowerCase()) ||
                          record.motherName.toLowerCase().includes(birthSearchTerm.toLowerCase()) ||
                          record.calfId.toLowerCase().includes(birthSearchTerm.toLowerCase());
-    const matchesStatus = birthStatusFilter === '' || record.status === birthStatusFilter;
+    const matchesStatus = birthStatusFilter === 'all' || record.status === birthStatusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -303,7 +303,7 @@ const BreedingReproduction = () => {
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Status</SelectItem>
+                    <SelectItem value="all">All Status</SelectItem>
                     {uniqueBreedingStatuses.map(status => (
                       <SelectItem key={status} value={status}>{status}</SelectItem>
                     ))}
@@ -433,7 +433,7 @@ const BreedingReproduction = () => {
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Status</SelectItem>
+                    <SelectItem value="all">All Status</SelectItem>
                     {uniqueBirthStatuses.map(status => (
                       <SelectItem key={status} value={status}>{status}</SelectItem>
                     ))}
