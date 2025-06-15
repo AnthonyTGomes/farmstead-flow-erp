@@ -56,24 +56,38 @@ const StatusSelector = ({
 
   // Filter out any options with empty string values
   const validOptions = options.filter(option => option.value && option.value.trim() !== '');
+  
+  // Ensure currentStatus is valid - if empty or invalid, use the first valid option or return null
+  const safeCurrentStatus = currentStatus && currentStatus.trim() !== '' ? currentStatus : validOptions[0]?.value;
+  
+  // If no valid status and no valid options, don't render the select
+  if (!safeCurrentStatus || validOptions.length === 0) {
+    return (
+      <Badge className="bg-gray-100 text-gray-800 flex items-center gap-1 px-2 py-1">
+        <span className="font-medium">No Status</span>
+      </Badge>
+    );
+  }
+
+  const safeCurrent = validOptions.find(option => option.value === safeCurrentStatus) || validOptions[0];
 
   // If read-only, just show a badge
   if (readOnly) {
     return (
-      <Badge className={`${currentOption?.color} flex items-center gap-1 px-2 py-1`}>
-        {getStatusIcon(currentStatus)}
-        <span className="font-medium">{currentOption?.label || currentStatus}</span>
+      <Badge className={`${safeCurrent?.color} flex items-center gap-1 px-2 py-1`}>
+        {getStatusIcon(safeCurrentStatus)}
+        <span className="font-medium">{safeCurrent?.label || safeCurrentStatus}</span>
       </Badge>
     );
   }
 
   return (
-    <Select value={currentStatus} onValueChange={onStatusChange} disabled={disabled}>
+    <Select value={safeCurrentStatus} onValueChange={onStatusChange} disabled={disabled}>
       <SelectTrigger className={`min-w-[120px] border hover:border-gray-400 transition-colors ${size === 'sm' ? 'h-8 text-xs' : 'h-9 text-sm'} bg-white`}>
         <SelectValue>
-          <Badge className={`${currentOption?.color} flex items-center gap-1 px-2 py-1`}>
-            {getStatusIcon(currentStatus)}
-            <span className="font-medium">{currentOption?.label || currentStatus}</span>
+          <Badge className={`${safeCurrent?.color} flex items-center gap-1 px-2 py-1`}>
+            {getStatusIcon(safeCurrentStatus)}
+            <span className="font-medium">{safeCurrent?.label || safeCurrentStatus}</span>
           </Badge>
         </SelectValue>
       </SelectTrigger>
