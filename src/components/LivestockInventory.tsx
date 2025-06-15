@@ -98,6 +98,7 @@ const LivestockInventory = () => {
     currentPage, 
     totalPages, 
     paginatedData, 
+    goToPage,
     goToNext, 
     goToPrevious, 
     hasNext, 
