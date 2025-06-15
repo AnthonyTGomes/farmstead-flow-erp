@@ -54,6 +54,9 @@ const StatusSelector = ({
     }
   };
 
+  // Filter out any options with empty string values
+  const validOptions = options.filter(option => option.value && option.value.trim() !== '');
+
   // If read-only, just show a badge
   if (readOnly) {
     return (
@@ -75,7 +78,7 @@ const StatusSelector = ({
         </SelectValue>
       </SelectTrigger>
       <SelectContent className="bg-white border shadow-lg z-50 min-w-[140px]">
-        {options.map((option) => (
+        {validOptions.map((option) => (
           <SelectItem 
             key={option.value} 
             value={option.value}
