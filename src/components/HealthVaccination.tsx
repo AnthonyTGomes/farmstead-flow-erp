@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, Syringe, Calendar, Eye, Edit, Trash2, CheckCircle, Search } from 'lucide-react';
+import { Heart, Syringe, Calendar, Eye, Edit, Trash2, CheckCircle, Search, Filter } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import VaccinationModal from '@/components/modals/VaccinationModal';
@@ -313,27 +313,39 @@ const HealthVaccination = () => {
                 <Syringe className="w-5 h-5 mr-2 text-blue-600" />
                 Vaccination Schedule
               </CardTitle>
-              <div className="flex space-x-2">
-                <div className="relative">
-                  <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              {/* Filter group - new UI for usability and responsiveness */}
+              <div className="flex flex-col md:flex-row gap-2 md:gap-4 bg-muted/50 rounded-lg p-3 items-stretch md:items-center border">
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                   <Input
                     placeholder="Search vaccinations..."
                     value={vaccinationSearchTerm}
                     onChange={(e) => setVaccinationSearchTerm(e.target.value)}
-                    className="pl-10 w-48"
+                    className="pl-10 w-full md:w-48"
                   />
                 </div>
-                <Select value={vaccinationStatusFilter} onValueChange={setVaccinationStatusFilter}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    {uniqueVaccinationStatuses.map(status => (
-                      <SelectItem key={status} value={status}>{status}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex-1">
+                  <Select value={vaccinationStatusFilter} onValueChange={setVaccinationStatusFilter}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      {uniqueVaccinationStatuses.map(status => (
+                        <SelectItem key={status} value={status}>{status}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <button 
+                  className="flex items-center justify-center gap-1 px-4 py-2 text-xs font-semibold bg-primary text-white rounded-md hover:scale-105 transition-transform shadow-sm border border-primary"
+                  tabIndex={-1}
+                  type="button"
+                  title="Filter"
+                >
+                  <Filter className="w-4 h-4" />
+                  Filter
+                </button>
               </div>
             </div>
           </CardHeader>
@@ -438,27 +450,39 @@ const HealthVaccination = () => {
                 <Heart className="w-5 h-5 mr-2 text-red-600" />
                 Health Records
               </CardTitle>
-              <div className="flex space-x-2">
-                <div className="relative">
-                  <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              {/* Filter group - new UI for usability and responsiveness */}
+              <div className="flex flex-col md:flex-row gap-2 md:gap-4 bg-muted/50 rounded-lg p-3 items-stretch md:items-center border">
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                   <Input
                     placeholder="Search health..."
                     value={healthSearchTerm}
                     onChange={(e) => setHealthSearchTerm(e.target.value)}
-                    className="pl-10 w-40"
+                    className="pl-10 w-full md:w-40"
                   />
                 </div>
-                <Select value={healthStatusFilter} onValueChange={setHealthStatusFilter}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Status</SelectItem>
-                    {uniqueHealthStatuses.map(status => (
-                      <SelectItem key={status} value={status}>{status}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex-1">
+                  <Select value={healthStatusFilter} onValueChange={setHealthStatusFilter}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      {uniqueHealthStatuses.map(status => (
+                        <SelectItem key={status} value={status}>{status}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <button 
+                  className="flex items-center justify-center gap-1 px-4 py-2 text-xs font-semibold bg-primary text-white rounded-md hover:scale-105 transition-transform shadow-sm border border-primary"
+                  tabIndex={-1}
+                  type="button"
+                  title="Filter"
+                >
+                  <Filter className="w-4 h-4" />
+                  Filter
+                </button>
               </div>
             </div>
           </CardHeader>
