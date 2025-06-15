@@ -1,15 +1,18 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, Baby, Calendar, Eye, Edit, Trash2, CheckCircle } from 'lucide-react';
+import { Heart, Baby, Calendar, Eye, Edit, Trash2, CheckCircle, Search } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import BreedingModal from '@/components/modals/BreedingModal';
 import ViewBreedingModal from '@/components/modals/ViewBreedingModal';
 import CompleteBreedingModal from '@/components/modals/CompleteBreedingModal';
 import StatusSelector from '@/components/ui/status-selector';
+import { usePagination } from '@/hooks/usePagination';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const BreedingReproduction = () => {
   const [breedingRecords, setBreedingRecords] = useState([
@@ -62,6 +65,10 @@ const BreedingReproduction = () => {
     }
   ]);
 
+  const [breedingSearchTerm, setBreedingSearchTerm] = useState('');
+  const [breedingStatusFilter, setBreedingStatusFilter] = useState('');
+  const [birthSearchTerm, setBirthSearchTerm] = useState('');
+  const [birthStatusFilter, setBirthStatusFilter] = useState('');
   const [viewBreedingModalOpen, setViewBreedingModalOpen] = useState(false);
   const [completeBreedingModalOpen, setCompleteBreedingModalOpen] = useState(false);
   const [selectedBreedingRecord, setSelectedBreedingRecord] = useState(null);
@@ -81,6 +88,44 @@ const BreedingReproduction = () => {
     { value: 'Sick', label: 'Sick', color: 'bg-red-100 text-red-800' },
     { value: 'Deceased', label: 'Deceased', color: 'bg-gray-100 text-gray-800' }
   ];
+
+  const filteredBreedingRecords = breedingRecords.filter(record => {
+    const matchesSearch = record.femaleName.toLowerCase().includes(breedingSearchTerm.toLowerCase()) ||
+                         record.femaleId.toLowerCase().includes(breedingSearchTerm.toLowerCase()) ||
+                         record.maleName.toLowerCase().includes(breedingSearchTerm.toLowerCase());
+    const matchesStatus = breedingStatusFilter === '' || record.status === breedingStatusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const filteredBirthRecords = birthRecords.filter(record => {
+    const matchesSearch = record.calfName.toLowerCase().includes(birthSearchTerm.toLowerCase()) ||
+                         record.motherName.toLowerCase().includes(birthSearchTerm.toLowerCase()) ||
+                         record.calfId.toLowerCase().includes(birthSearchTerm.toLowerCase());
+    const matchesStatus = birthStatusFilter === '' || record.status === birthStatusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const { 
+    currentPage: breedingCurrentPage, 
+    totalPages: breedingTotalPages, 
+    paginatedData: paginatedBreedingData, 
+    goToNext: breedingGoToNext, 
+    goToPrevious: breedingGoToPrevious, 
+    hasNext: breedingHasNext, 
+    hasPrevious: breedingHasPrevious,
+    goToPage: breedingGoToPage
+  } = usePagination({ data: filteredBreedingRecords, itemsPerPage: 5 });
+
+  const { 
+    currentPage: birthCurrentPage, 
+    totalPages: birthTotalPages, 
+    paginatedData: paginatedBirthData, 
+    goToNext: birthGoToNext, 
+    goToPrevious: birthGoToPrevious, 
+    hasNext: birthHasNext, 
+    hasPrevious: birthHasPrevious,
+    goToPage: birthGoToPage
+  } = usePagination({ data: filteredBirthRecords, itemsPerPage: 5 });
 
   const getStatusColor = (status: string) => {
     const allOptions = [...breedingStatusOptions, ...birthStatusOptions];
@@ -172,6 +217,9 @@ const BreedingReproduction = () => {
     return ['Breeding', 'Confirmed', 'Pregnant'].includes(status);
   };
 
+  const uniqueBreedingStatuses = [...new Set(breedingRecords.map(record => record.status))];
+  const uniqueBirthStatuses = [...new Set(birthRecords.map(record => record.status))];
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -235,10 +283,34 @@ const BreedingReproduction = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Heart className="w-5 h-5 mr-2 text-purple-600" />
-              Active Breeding Records
-            </CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle className="flex items-center">
+                <Heart className="w-5 h-5 mr-2 text-purple-600" />
+                Active Breeding Records
+              </CardTitle>
+              <div className="flex space-x-2">
+                <div className="relative">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Input
+                    placeholder="Search breeding..."
+                    value={breedingSearchTerm}
+                    onChange={(e) => setBreedingSearchTerm(e.target.value)}
+                    className="pl-10 w-40"
+                  />
+                </div>
+                <Select value={breedingStatusFilter} onValueChange={setBreedingStatusFilter}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Status</SelectItem>
+                    {uniqueBreedingStatuses.map(status => (
+                      <SelectItem key={status} value={status}>{status}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <Table>
@@ -252,7 +324,7 @@ const BreedingReproduction = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {breedingRecords.map((record) => (
+                {paginatedBreedingData.map((record) => (
                   <TableRow key={record.id}>
                     <TableCell>
                       <div>
@@ -304,15 +376,71 @@ const BreedingReproduction = () => {
                 ))}
               </TableBody>
             </Table>
+            
+            {breedingTotalPages > 1 && (
+              <div className="flex justify-center mt-4">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={breedingGoToPrevious}
+                        className={!breedingHasPrevious ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    {Array.from({ length: breedingTotalPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink 
+                          onClick={() => breedingGoToPage(page)}
+                          isActive={breedingCurrentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={breedingGoToNext}
+                        className={!breedingHasNext ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Baby className="w-5 h-5 mr-2 text-pink-600" />
-              Recent Births
-            </CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle className="flex items-center">
+                <Baby className="w-5 h-5 mr-2 text-pink-600" />
+                Recent Births
+              </CardTitle>
+              <div className="flex space-x-2">
+                <div className="relative">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Input
+                    placeholder="Search births..."
+                    value={birthSearchTerm}
+                    onChange={(e) => setBirthSearchTerm(e.target.value)}
+                    className="pl-10 w-40"
+                  />
+                </div>
+                <Select value={birthStatusFilter} onValueChange={setBirthStatusFilter}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Status</SelectItem>
+                    {uniqueBirthStatuses.map(status => (
+                      <SelectItem key={status} value={status}>{status}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <Table>
@@ -326,7 +454,7 @@ const BreedingReproduction = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {birthRecords.map((record) => (
+                {paginatedBirthData.map((record) => (
                   <TableRow key={record.id}>
                     <TableCell>
                       <div>
@@ -366,6 +494,38 @@ const BreedingReproduction = () => {
                 ))}
               </TableBody>
             </Table>
+            
+            {birthTotalPages > 1 && (
+              <div className="flex justify-center mt-4">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={birthGoToPrevious}
+                        className={!birthHasPrevious ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    {Array.from({ length: birthTotalPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink 
+                          onClick={() => birthGoToPage(page)}
+                          isActive={birthCurrentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={birthGoToNext}
+                        className={!birthHasNext ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Milk, Beef, TrendingUp, Plus, Calendar } from 'lucide-react';
+import { Milk, Beef, TrendingUp, Plus, Calendar, Search, Filter } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import ProductionModal from '@/components/modals/ProductionModal';
 import FeedModal from '@/components/modals/FeedModal';
+import { usePagination } from '@/hooks/usePagination';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const ProductionTracking = () => {
   const [milkRecords] = useState([
@@ -61,6 +65,11 @@ const ProductionTracking = () => {
     }
   ]);
 
+  const [milkSearchTerm, setMilkSearchTerm] = useState('');
+  const [milkQualityFilter, setMilkQualityFilter] = useState('');
+  const [feedSearchTerm, setFeedSearchTerm] = useState('');
+  const [feedTypeFilter, setFeedTypeFilter] = useState('');
+
   const getQualityColor = (quality: string) => {
     switch (quality) {
       case 'A+': return 'bg-green-100 text-green-800';
@@ -70,6 +79,45 @@ const ProductionTracking = () => {
       default: return 'bg-gray-100 text-gray-800';
     }
   };
+
+  const filteredMilkRecords = milkRecords.filter(record => {
+    const matchesSearch = record.animalName.toLowerCase().includes(milkSearchTerm.toLowerCase()) ||
+                         record.animalId.toLowerCase().includes(milkSearchTerm.toLowerCase());
+    const matchesQuality = milkQualityFilter === '' || record.quality === milkQualityFilter;
+    return matchesSearch && matchesQuality;
+  });
+
+  const filteredFeedRecords = feedRecords.filter(record => {
+    const matchesSearch = record.feedType.toLowerCase().includes(feedSearchTerm.toLowerCase()) ||
+                         record.supplier.toLowerCase().includes(feedSearchTerm.toLowerCase());
+    const matchesType = feedTypeFilter === '' || record.feedType === feedTypeFilter;
+    return matchesSearch && matchesType;
+  });
+
+  const { 
+    currentPage: milkCurrentPage, 
+    totalPages: milkTotalPages, 
+    paginatedData: paginatedMilkData, 
+    goToNext: milkGoToNext, 
+    goToPrevious: milkGoToPrevious, 
+    hasNext: milkHasNext, 
+    hasPrevious: milkHasPrevious,
+    goToPage: milkGoToPage
+  } = usePagination({ data: filteredMilkRecords, itemsPerPage: 5 });
+
+  const { 
+    currentPage: feedCurrentPage, 
+    totalPages: feedTotalPages, 
+    paginatedData: paginatedFeedData, 
+    goToNext: feedGoToNext, 
+    goToPrevious: feedGoToPrevious, 
+    hasNext: feedHasNext, 
+    hasPrevious: feedHasPrevious,
+    goToPage: feedGoToPage
+  } = usePagination({ data: filteredFeedRecords, itemsPerPage: 5 });
+
+  const uniqueQualities = [...new Set(milkRecords.map(record => record.quality))];
+  const uniqueFeedTypes = [...new Set(feedRecords.map(record => record.feedType))];
 
   return (
     <div className="space-y-6">
@@ -81,6 +129,7 @@ const ProductionTracking = () => {
         </div>
       </div>
 
+      
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
@@ -131,10 +180,34 @@ const ProductionTracking = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Milk className="w-5 h-5 mr-2 text-blue-600" />
-              Daily Milk Production
-            </CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle className="flex items-center">
+                <Milk className="w-5 h-5 mr-2 text-blue-600" />
+                Daily Milk Production
+              </CardTitle>
+              <div className="flex space-x-2">
+                <div className="relative">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Input
+                    placeholder="Search animals..."
+                    value={milkSearchTerm}
+                    onChange={(e) => setMilkSearchTerm(e.target.value)}
+                    className="pl-10 w-48"
+                  />
+                </div>
+                <Select value={milkQualityFilter} onValueChange={setMilkQualityFilter}>
+                  <SelectTrigger className="w-28">
+                    <SelectValue placeholder="Quality" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All</SelectItem>
+                    {uniqueQualities.map(quality => (
+                      <SelectItem key={quality} value={quality}>{quality}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <Table>
@@ -148,7 +221,7 @@ const ProductionTracking = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {milkRecords.map((record, index) => (
+                {paginatedMilkData.map((record, index) => (
                   <TableRow key={index}>
                     <TableCell>
                       <div>
@@ -168,6 +241,39 @@ const ProductionTracking = () => {
                 ))}
               </TableBody>
             </Table>
+            
+            {milkTotalPages > 1 && (
+              <div className="flex justify-center mt-4">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={milkGoToPrevious}
+                        className={!milkHasPrevious ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    {Array.from({ length: milkTotalPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink 
+                          onClick={() => milkGoToPage(page)}
+                          isActive={milkCurrentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={milkGoToNext}
+                        className={!milkHasNext ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+            
             <div className="mt-4 p-4 bg-blue-50 rounded-lg">
               <div className="flex justify-between items-center">
                 <span className="font-medium">Total Today:</span>
@@ -179,14 +285,38 @@ const ProductionTracking = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Beef className="w-5 h-5 mr-2 text-green-600" />
-              Feed Consumption
-            </CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle className="flex items-center">
+                <Beef className="w-5 h-5 mr-2 text-green-600" />
+                Feed Consumption
+              </CardTitle>
+              <div className="flex flex-col space-y-2">
+                <div className="relative">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Input
+                    placeholder="Search feed..."
+                    value={feedSearchTerm}
+                    onChange={(e) => setFeedSearchTerm(e.target.value)}
+                    className="pl-10 w-40"
+                  />
+                </div>
+                <Select value={feedTypeFilter} onValueChange={setFeedTypeFilter}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue placeholder="Feed Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Types</SelectItem>
+                    {uniqueFeedTypes.map(type => (
+                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {feedRecords.map((feed, index) => (
+              {paginatedFeedData.map((feed, index) => (
                 <div key={index} className="p-3 border rounded-lg">
                   <div className="flex justify-between items-start">
                     <div>
@@ -202,6 +332,39 @@ const ProductionTracking = () => {
                 </div>
               ))}
             </div>
+            
+            {feedTotalPages > 1 && (
+              <div className="flex justify-center mt-4">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={feedGoToPrevious}
+                        className={!feedHasPrevious ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    {Array.from({ length: feedTotalPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink 
+                          onClick={() => feedGoToPage(page)}
+                          isActive={feedCurrentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={feedGoToNext}
+                        className={!feedHasNext ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+            
             <div className="mt-4 p-3 bg-green-50 rounded-lg">
               <div className="flex justify-between items-center">
                 <span className="font-medium">Daily Cost:</span>

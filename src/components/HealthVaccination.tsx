@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, Syringe, Calendar, Eye, Edit, Trash2, CheckCircle } from 'lucide-react';
+import { Heart, Syringe, Calendar, Eye, Edit, Trash2, CheckCircle, Search } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import VaccinationModal from '@/components/modals/VaccinationModal';
@@ -13,6 +12,10 @@ import CompleteHealthModal from '@/components/modals/CompleteHealthModal';
 import ViewVaccinationModal from '@/components/modals/ViewVaccinationModal';
 import ViewHealthModal from '@/components/modals/ViewHealthModal';
 import StatusSelector from '@/components/ui/status-selector';
+import { usePagination } from '@/hooks/usePagination';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const HealthVaccination = () => {
   const [vaccinationSchedules, setVaccinationSchedules] = useState([
@@ -59,6 +62,10 @@ const HealthVaccination = () => {
     }
   ]);
 
+  const [vaccinationSearchTerm, setVaccinationSearchTerm] = useState('');
+  const [vaccinationStatusFilter, setVaccinationStatusFilter] = useState('');
+  const [healthSearchTerm, setHealthSearchTerm] = useState('');
+  const [healthStatusFilter, setHealthStatusFilter] = useState('');
   const [viewVaccinationModalOpen, setViewVaccinationModalOpen] = useState(false);
   const [viewHealthModalOpen, setViewHealthModalOpen] = useState(false);
   const [completeVaccinationModalOpen, setCompleteVaccinationModalOpen] = useState(false);
@@ -82,6 +89,44 @@ const HealthVaccination = () => {
     { value: 'Recovered', label: 'Recovered', color: 'bg-blue-100 text-blue-800' },
     { value: 'Monitoring', label: 'Monitoring', color: 'bg-purple-100 text-purple-800' }
   ];
+
+  const filteredVaccinationSchedules = vaccinationSchedules.filter(schedule => {
+    const matchesSearch = schedule.animalName.toLowerCase().includes(vaccinationSearchTerm.toLowerCase()) ||
+                         schedule.animalId.toLowerCase().includes(vaccinationSearchTerm.toLowerCase()) ||
+                         schedule.vaccine.toLowerCase().includes(vaccinationSearchTerm.toLowerCase());
+    const matchesStatus = vaccinationStatusFilter === '' || schedule.status === vaccinationStatusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const filteredHealthRecords = healthRecords.filter(record => {
+    const matchesSearch = record.animalName.toLowerCase().includes(healthSearchTerm.toLowerCase()) ||
+                         record.animalId.toLowerCase().includes(healthSearchTerm.toLowerCase()) ||
+                         record.checkupType.toLowerCase().includes(healthSearchTerm.toLowerCase());
+    const matchesStatus = healthStatusFilter === '' || record.status === healthStatusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const { 
+    currentPage: vaccinationCurrentPage, 
+    totalPages: vaccinationTotalPages, 
+    paginatedData: paginatedVaccinationData, 
+    goToNext: vaccinationGoToNext, 
+    goToPrevious: vaccinationGoToPrevious, 
+    hasNext: vaccinationHasNext, 
+    hasPrevious: vaccinationHasPrevious,
+    goToPage: vaccinationGoToPage
+  } = usePagination({ data: filteredVaccinationSchedules, itemsPerPage: 5 });
+
+  const { 
+    currentPage: healthCurrentPage, 
+    totalPages: healthTotalPages, 
+    paginatedData: paginatedHealthData, 
+    goToNext: healthGoToNext, 
+    goToPrevious: healthGoToPrevious, 
+    hasNext: healthHasNext, 
+    hasPrevious: healthHasPrevious,
+    goToPage: healthGoToPage
+  } = usePagination({ data: filteredHealthRecords, itemsPerPage: 5 });
 
   const handleVaccinationStatusChange = (scheduleId: string, newStatus: string) => {
     setVaccinationSchedules(prev => prev.map(schedule => 
@@ -179,6 +224,19 @@ const HealthVaccination = () => {
     return ['Sick', 'Under Treatment'].includes(status);
   };
 
+  const uniqueVaccinationStatuses = [...new Set(vaccinationSchedules.map(schedule => schedule.status))];
+  const uniqueHealthStatuses = [...new Set(healthRecords.map(record => record.status))];
+
+  const getStatusColor = (status: string) => {
+    const vaccinationOption = vaccinationStatusOptions.find(opt => opt.value === status);
+    if (vaccinationOption) return vaccinationOption.color || 'bg-gray-100 text-gray-800';
+  
+    const healthOption = healthStatusOptions.find(opt => opt.value === status);
+    if (healthOption) return healthOption.color || 'bg-gray-100 text-gray-800';
+  
+    return 'bg-gray-100 text-gray-800';
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -241,10 +299,34 @@ const HealthVaccination = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Syringe className="w-5 h-5 mr-2 text-blue-600" />
-              Vaccination Schedule
-            </CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle className="flex items-center">
+                <Syringe className="w-5 h-5 mr-2 text-blue-600" />
+                Vaccination Schedule
+              </CardTitle>
+              <div className="flex space-x-2">
+                <div className="relative">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Input
+                    placeholder="Search vaccinations..."
+                    value={vaccinationSearchTerm}
+                    onChange={(e) => setVaccinationSearchTerm(e.target.value)}
+                    className="pl-10 w-48"
+                  />
+                </div>
+                <Select value={vaccinationStatusFilter} onValueChange={setVaccinationStatusFilter}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Status</SelectItem>
+                    {uniqueVaccinationStatuses.map(status => (
+                      <SelectItem key={status} value={status}>{status}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <Table>
@@ -258,7 +340,7 @@ const HealthVaccination = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {vaccinationSchedules.map((schedule) => (
+                {paginatedVaccinationData.map((schedule) => (
                   <TableRow key={schedule.id}>
                     <TableCell>
                       <div>
@@ -305,15 +387,71 @@ const HealthVaccination = () => {
                 ))}
               </TableBody>
             </Table>
+            
+            {vaccinationTotalPages > 1 && (
+              <div className="flex justify-center mt-4">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={vaccinationGoToPrevious}
+                        className={!vaccinationHasPrevious ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    {Array.from({ length: vaccinationTotalPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink 
+                          onClick={() => vaccinationGoToPage(page)}
+                          isActive={vaccinationCurrentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={vaccinationGoToNext}
+                        className={!vaccinationHasNext ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Heart className="w-5 h-5 mr-2 text-red-600" />
-              Health Records
-            </CardTitle>
+            <div className="flex justify-between items-center">
+              <CardTitle className="flex items-center">
+                <Heart className="w-5 h-5 mr-2 text-red-600" />
+                Health Records
+              </CardTitle>
+              <div className="flex space-x-2">
+                <div className="relative">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Input
+                    placeholder="Search health..."
+                    value={healthSearchTerm}
+                    onChange={(e) => setHealthSearchTerm(e.target.value)}
+                    className="pl-10 w-40"
+                  />
+                </div>
+                <Select value={healthStatusFilter} onValueChange={setHealthStatusFilter}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Status</SelectItem>
+                    {uniqueHealthStatuses.map(status => (
+                      <SelectItem key={status} value={status}>{status}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <Table>
@@ -327,7 +465,7 @@ const HealthVaccination = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {healthRecords.map((record) => (
+                {paginatedHealthData.map((record) => (
                   <TableRow key={record.id}>
                     <TableCell>
                       <div>
@@ -374,6 +512,38 @@ const HealthVaccination = () => {
                 ))}
               </TableBody>
             </Table>
+            
+            {healthTotalPages > 1 && (
+              <div className="flex justify-center mt-4">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={healthGoToPrevious}
+                        className={!healthHasPrevious ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    {Array.from({ length: healthTotalPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink 
+                          onClick={() => healthGoToPage(page)}
+                          isActive={healthCurrentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={healthGoToNext}
+                        className={!healthHasNext ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

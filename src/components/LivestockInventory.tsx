@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast';
 import AddAnimalModal from '@/components/modals/AddAnimalModal';
 import ViewAnimalModal from '@/components/modals/ViewAnimalModal';
+import { usePagination } from '@/hooks/usePagination';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const LivestockInventory = () => {
   const [animals, setAnimals] = useState([
@@ -46,6 +48,8 @@ const LivestockInventory = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [filterBreed, setFilterBreed] = useState('');
+  const [filterGender, setFilterGender] = useState('');
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedAnimal, setSelectedAnimal] = useState(null);
   const { toast } = useToast();
@@ -84,13 +88,29 @@ const LivestockInventory = () => {
     const matchesSearch = animal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          animal.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          animal.breed.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterStatus === '' || animal.status === filterStatus;
-    return matchesSearch && matchesFilter;
+    const matchesStatus = filterStatus === '' || animal.status === filterStatus;
+    const matchesBreed = filterBreed === '' || animal.breed === filterBreed;
+    const matchesGender = filterGender === '' || animal.gender === filterGender;
+    return matchesSearch && matchesStatus && matchesBreed && matchesGender;
   });
+
+  const { 
+    currentPage, 
+    totalPages, 
+    paginatedData, 
+    goToNext, 
+    goToPrevious, 
+    hasNext, 
+    hasPrevious,
+    totalItems 
+  } = usePagination({ data: filteredAnimals, itemsPerPage: 10 });
 
   const handleAddAnimal = (newAnimal: any) => {
     setAnimals([...animals, newAnimal]);
   };
+
+  const uniqueBreeds = [...new Set(animals.map(animal => animal.breed))];
+  const uniqueStatuses = [...new Set(animals.map(animal => animal.status))];
 
   return (
     <div className="space-y-6">
@@ -168,18 +188,45 @@ const LivestockInventory = () => {
                   className="pl-10 w-64"
                 />
               </div>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setFilterStatus(filterStatus === 'Active' ? '' : 'Active')}
-              >
-                <Filter className="w-4 h-4 mr-2" />
-                {filterStatus === 'Active' ? 'Show All' : 'Active Only'}
-              </Button>
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger className="w-32">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Status</SelectItem>
+                  {uniqueStatuses.map(status => (
+                    <SelectItem key={status} value={status}>{status}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={filterBreed} onValueChange={setFilterBreed}>
+                <SelectTrigger className="w-32">
+                  <SelectValue placeholder="Breed" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Breeds</SelectItem>
+                  {uniqueBreeds.map(breed => (
+                    <SelectItem key={breed} value={breed}>{breed}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={filterGender} onValueChange={setFilterGender}>
+                <SelectTrigger className="w-32">
+                  <SelectValue placeholder="Gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Genders</SelectItem>
+                  <SelectItem value="Male">Male</SelectItem>
+                  <SelectItem value="Female">Female</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardHeader>
         <CardContent>
+          <div className="mb-4 text-sm text-gray-600">
+            Showing {paginatedData.length} of {totalItems} animals
+          </div>
           <Table>
             <TableHeader>
               <TableRow>
@@ -194,7 +241,7 @@ const LivestockInventory = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredAnimals.map((animal) => (
+              {paginatedData.map((animal) => (
                 <TableRow key={animal.id}>
                   <TableCell className="font-medium">{animal.id}</TableCell>
                   <TableCell>{animal.name}</TableCell>
@@ -224,6 +271,38 @@ const LivestockInventory = () => {
               ))}
             </TableBody>
           </Table>
+          
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-4">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={goToPrevious}
+                      className={!hasPrevious ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink 
+                        onClick={() => goToPage(page)}
+                        isActive={currentPage === page}
+                        className="cursor-pointer"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={goToNext}
+                      className={!hasNext ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </CardContent>
       </Card>
 
