@@ -63,9 +63,9 @@ const HealthVaccination = () => {
   ]);
 
   const [vaccinationSearchTerm, setVaccinationSearchTerm] = useState('');
-  const [vaccinationStatusFilter, setVaccinationStatusFilter] = useState('');
+  const [vaccinationStatusFilter, setVaccinationStatusFilter] = useState('all');
   const [healthSearchTerm, setHealthSearchTerm] = useState('');
-  const [healthStatusFilter, setHealthStatusFilter] = useState('');
+  const [healthStatusFilter, setHealthStatusFilter] = useState('all');
   const [viewVaccinationModalOpen, setViewVaccinationModalOpen] = useState(false);
   const [viewHealthModalOpen, setViewHealthModalOpen] = useState(false);
   const [completeVaccinationModalOpen, setCompleteVaccinationModalOpen] = useState(false);
@@ -94,7 +94,7 @@ const HealthVaccination = () => {
     const matchesSearch = schedule.animalName.toLowerCase().includes(vaccinationSearchTerm.toLowerCase()) ||
                          schedule.animalId.toLowerCase().includes(vaccinationSearchTerm.toLowerCase()) ||
                          schedule.vaccine.toLowerCase().includes(vaccinationSearchTerm.toLowerCase());
-    const matchesStatus = vaccinationStatusFilter === '' || schedule.status === vaccinationStatusFilter;
+    const matchesStatus = vaccinationStatusFilter === 'all' || schedule.status === vaccinationStatusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -102,7 +102,7 @@ const HealthVaccination = () => {
     const matchesSearch = record.animalName.toLowerCase().includes(healthSearchTerm.toLowerCase()) ||
                          record.animalId.toLowerCase().includes(healthSearchTerm.toLowerCase()) ||
                          record.checkupType.toLowerCase().includes(healthSearchTerm.toLowerCase());
-    const matchesStatus = healthStatusFilter === '' || record.status === healthStatusFilter;
+    const matchesStatus = healthStatusFilter === 'all' || record.status === healthStatusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -319,7 +319,7 @@ const HealthVaccination = () => {
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Status</SelectItem>
+                    <SelectItem value="all">All Status</SelectItem>
                     {uniqueVaccinationStatuses.map(status => (
                       <SelectItem key={status} value={status}>{status}</SelectItem>
                     ))}
@@ -444,7 +444,7 @@ const HealthVaccination = () => {
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Status</SelectItem>
+                    <SelectItem value="all">All Status</SelectItem>
                     {uniqueHealthStatuses.map(status => (
                       <SelectItem key={status} value={status}>{status}</SelectItem>
                     ))}
