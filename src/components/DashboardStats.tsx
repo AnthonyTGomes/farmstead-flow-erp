@@ -31,7 +31,7 @@ const DashboardStats = () => {
     },
     {
       title: 'Monthly Revenue',
-      value: '$12,450',
+      value: '12,450',
       change: '+8% from last month',
       icon: DollarSign,
       color: 'text-orange-600',

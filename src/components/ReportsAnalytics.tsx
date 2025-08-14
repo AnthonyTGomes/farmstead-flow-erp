@@ -124,7 +124,7 @@ const ReportsAnalytics = () => {
             <div className="flex items-center space-x-2">
               <DollarSign className="w-8 h-8 text-orange-600" />
               <div>
-                <div className="text-2xl font-bold text-orange-600">$4.2K</div>
+                <div className="text-2xl font-bold text-orange-600">4.2K</div>
                 <div className="text-sm text-gray-600">Avg Monthly Profit</div>
               </div>
             </div>
@@ -174,7 +174,7 @@ const ReportsAnalytics = () => {
                   </div>
                   <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
                     <span>Cost per Liter</span>
-                    <span className="font-bold text-green-600">$0.45</span>
+                    <span className="font-bold text-green-600">0.45</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-purple-50 rounded-lg">
                     <span>Feed Quality Score</span>
@@ -204,8 +204,8 @@ const ReportsAnalytics = () => {
                       <XAxis dataKey="month" />
                       <YAxis />
                       <ChartTooltip content={<ChartTooltipContent />} />
-                      <Line type="monotone" dataKey="revenue" stroke="#22c55e" strokeWidth={3} name="Revenue ($)" />
-                      <Line type="monotone" dataKey="expenses" stroke="#ef4444" strokeWidth={3} name="Expenses ($)" />
+                      <Line type="monotone" dataKey="revenue" stroke="#22c55e" strokeWidth={3} name="Revenue" />
+                      <Line type="monotone" dataKey="expenses" stroke="#ef4444" strokeWidth={3} name="Expenses" />
                     </LineChart>
                   </ResponsiveContainer>
                 </ChartContainer>

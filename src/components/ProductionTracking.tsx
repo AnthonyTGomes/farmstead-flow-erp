@@ -46,21 +46,21 @@ const ProductionTracking = () => {
       date: '2024-05-28',
       feedType: 'Hay',
       quantity: '250 kg',
-      cost: '$125',
+      cost: '125',
       supplier: 'Green Valley Farm'
     },
     {
       date: '2024-05-28',
       feedType: 'Concentrate',
       quantity: '100 kg',
-      cost: '$180',
+      cost: '180',
       supplier: 'Feed Master Ltd'
     },
     {
       date: '2024-05-27',
       feedType: 'Silage',
       quantity: '300 kg',
-      cost: '$90',
+      cost: '90',
       supplier: 'Local Co-op'
     }
   ]);
@@ -368,7 +368,7 @@ const ProductionTracking = () => {
             <div className="mt-4 p-3 bg-green-50 rounded-lg">
               <div className="flex justify-between items-center">
                 <span className="font-medium">Daily Cost:</span>
-                <span className="text-lg font-bold text-green-600">$395</span>
+                <span className="text-lg font-bold text-green-600">395</span>
               </div>
             </div>
           </CardContent>

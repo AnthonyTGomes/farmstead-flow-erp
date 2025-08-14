@@ -98,7 +98,7 @@ const FinancialManagement = () => {
             <div className="flex items-center space-x-2">
               <DollarSign className="w-8 h-8 text-green-600" />
               <div>
-                <div className="text-2xl font-bold text-green-600">$12,450</div>
+                <div className="text-2xl font-bold text-green-600">12,450</div>
                 <div className="text-sm text-gray-600">Monthly Revenue</div>
               </div>
             </div>
@@ -109,7 +109,7 @@ const FinancialManagement = () => {
             <div className="flex items-center space-x-2">
               <TrendingDown className="w-8 h-8 text-red-600" />
               <div>
-                <div className="text-2xl font-bold text-red-600">$8,200</div>
+                <div className="text-2xl font-bold text-red-600">8,200</div>
                 <div className="text-sm text-gray-600">Monthly Expenses</div>
               </div>
             </div>
@@ -120,7 +120,7 @@ const FinancialManagement = () => {
             <div className="flex items-center space-x-2">
               <TrendingUp className="w-8 h-8 text-blue-600" />
               <div>
-                <div className="text-2xl font-bold text-blue-600">$4,250</div>
+                <div className="text-2xl font-bold text-blue-600">4,250</div>
                 <div className="text-sm text-gray-600">Net Profit</div>
               </div>
             </div>
@@ -172,7 +172,7 @@ const FinancialManagement = () => {
                     </TableCell>
                     <TableCell>{txn.category}</TableCell>
                     <TableCell className={txn.type === 'Income' ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
-                      {txn.type === 'Income' ? '+' : '-'}${txn.amount}
+                      {txn.type === 'Income' ? '+' : '-'}{txn.amount}
                     </TableCell>
                     <TableCell className="text-sm">{txn.description}</TableCell>
                     <TableCell>
@@ -208,7 +208,7 @@ const FinancialManagement = () => {
                 <div key={index} className="space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">{expense.category}</span>
-                    <span className="text-sm text-gray-600">${expense.amount}</span>
+                    <span className="text-sm text-gray-600">{expense.amount}</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
@@ -223,7 +223,7 @@ const FinancialManagement = () => {
             <div className="mt-4 p-3 bg-gray-50 rounded-lg">
               <div className="flex justify-between items-center">
                 <span className="font-medium">Total Expenses:</span>
-                <span className="text-lg font-bold text-red-600">$18,800</span>
+                <span className="text-lg font-bold text-red-600">18,800</span>
               </div>
             </div>
           </CardContent>

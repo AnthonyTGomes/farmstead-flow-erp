@@ -84,7 +84,7 @@ const FeedModal = () => {
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="cost">Cost ($)</Label>
+              <Label htmlFor="cost">Cost</Label>
               <Input
                 id="cost"
                 type="number"
