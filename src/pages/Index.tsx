@@ -25,7 +25,7 @@ const Index = () => {
           <div className="space-y-6">
             {/* Welcome Banner */}
             <div className="bg-gradient-to-r from-green-600 to-blue-600 rounded-lg p-6 text-white">
-              <h2 className="text-2xl font-bold mb-2">Welcome back, John!</h2>
+              <h2 className="text-2xl font-bold mb-2">Welcome back, Mr. Moti!</h2>
               <p className="text-green-100">Here's what's happening on your farm today</p>
             </div>
 
@@ -103,7 +103,7 @@ const Index = () => {
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
               </div>
               <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">JD</span>
+                <span className="text-white font-semibold text-sm">MM</span>
               </div>
             </div>
 

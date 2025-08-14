@@ -11,7 +11,7 @@ const FarmSettings = () => {
   const [users] = useState([
     {
       id: 'USR001',
-      name: 'John Doe',
+      name: 'Mr. Moti',
       email: 'john@farm.com',
       role: 'Owner',
       status: 'Active',
@@ -91,7 +91,7 @@ const FarmSettings = () => {
                   <input 
                     type="text" 
                     className="w-full p-2 border border-gray-300 rounded-md" 
-                    defaultValue="John Doe"
+                    defaultValue="Mr. Moti"
                   />
                 </div>
                 <div>
