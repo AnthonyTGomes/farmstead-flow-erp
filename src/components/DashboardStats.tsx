@@ -48,7 +48,11 @@ const DashboardStats = () => {
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium text-gray-600">{stat.title}</CardTitle>
               <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                <Icon className={`w-4 h-4 ${stat.color}`} />
+                {stat.title === 'Monthly Revenue' ? (
+                  <div className={`w-4 h-4 ${stat.color} font-bold text-lg flex items-center justify-center`}>৳</div>
+                ) : (
+                  <Icon className={`w-4 h-4 ${stat.color}`} />
+                )}
               </div>
             </CardHeader>
             <CardContent>
