@@ -96,7 +96,7 @@ const FinancialManagement = () => {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 text-green-600 font-bold text-lg flex items-center justify-center">৳</div>
+              <div className="w-8 h-8 text-green-600 font-bold text-2xl flex items-center justify-center">৳</div>
               <div>
                 <div className="text-2xl font-bold text-green-600">12,450</div>
                 <div className="text-sm text-gray-600">Monthly Revenue</div>
