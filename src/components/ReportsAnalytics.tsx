@@ -122,7 +122,7 @@ const ReportsAnalytics = () => {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <DollarSign className="w-8 h-8 text-orange-600" />
+              <div className="w-8 h-8 text-orange-600 font-bold text-2xl flex items-center justify-center">৳</div>
               <div>
                 <div className="text-2xl font-bold text-orange-600">4.2K</div>
                 <div className="text-sm text-gray-600">Avg Monthly Profit</div>
